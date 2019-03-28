@@ -1,5 +1,5 @@
 {
-  "name": "ArchivesSubmitService",
+  "name": "archives-submit",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,9 @@
   },
   "dependencies": {
     "vue": "^2.6.6",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "vue2-dropzone": "^3.4.0",
+    "axios": "^0.18.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.5.0",

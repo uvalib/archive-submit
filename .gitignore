@@ -9,7 +9,7 @@ bin
 /config.yml
 dist/
 .idea
-/src
 env.*
 /pkg
 *.sh
+/uploads
