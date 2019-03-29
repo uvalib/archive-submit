@@ -67,8 +67,16 @@ export default {
 <style scoped>
 
 div.submit {
-  padding: 15px 25px;
+  padding: 30px 50px;;
   min-height: 600px;
+  background: white;
+  min-width: 1000px;
+  width: 75%;
+  margin: 0 auto;
+  border-right: 1px solid #dfdacc;
+  border-left: 1px solid #dfdacc;
+  font-weight: 400;
+  color: #333;
 }
 h2 {
   margin: 0;

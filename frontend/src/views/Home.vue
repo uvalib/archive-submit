@@ -20,7 +20,7 @@
             I am not affiliated with UVA.
          </label>
          <router-link to="/submit">
-            <button class="pure-button pure-button-primary">Continue</button>
+            <button id="continue-btn" class="pure-button pure-button-primary">Continue</button>
          </router-link>
       </div>
    </div>
@@ -33,6 +33,9 @@ export default {
 </script>
 
 <style scoped>
+#continue-btn {
+   float: right;
+}
 a {
    color: cornflowerblue;
    font-weight: 500;
@@ -41,11 +44,13 @@ a {
 span.admin {
    font-size: 12px;
    position: absolute;
+   right: 0;
 }
 a:hover {
  text-decoration: underline;  
 }
 div.home {
+   min-width: 1000px;
   padding: 30px 50px;;
   min-height: 600px;
   background: white;

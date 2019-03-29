@@ -12,16 +12,14 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Home',
+      name: 'home',
       component: Home
     },
     {
       path: '/submit',
-      name: 'Submit',
       component: Submit
     },{
       path: '/admin',
-      name: 'Admin',
       component: Admin
     }
   ]
