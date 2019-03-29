@@ -1,6 +1,13 @@
 <template>
    <div class="home">
-      <h2>Archives Records Transfer System</h2>
+      <h2>
+         <span>Archives Records Transfer System</span>
+         <span class="admin">
+            <router-link to="/admin">
+               <button class="pure-button pure-button-primary">Admin Access</button>
+            </router-link>
+         </span>
+      </h2>
       <div class="access-type">
          <h3>Access the submission form</h3>
          <label>
@@ -12,6 +19,9 @@
             <input type="radio" name="is_uva" id="guest" value="yes" checked="checked">
             I am not affiliated with UVA.
          </label>
+         <router-link to="/submit">
+            <button class="pure-button pure-button-primary">Continue</button>
+         </router-link>
       </div>
    </div>
 </template>
@@ -27,6 +37,10 @@ a {
    color: cornflowerblue;
    font-weight: 500;
    text-decoration: none;
+}
+span.admin {
+   font-size: 12px;
+   position: absolute;
 }
 a:hover {
  text-decoration: underline;  
@@ -46,6 +60,7 @@ h2 {
   margin: 0;
   color:#51822F;
   font-weight: bold;
+  position: relative;
 }
 h3 {
    color:#EB5F0C;

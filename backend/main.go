@@ -16,6 +16,9 @@ import (
 // Version of the service
 const version = "1.0.0"
 
+// Config info
+var uploadDir string
+
 // favHandler is a dummy handler to silence browser API requests that look for /favicon.ico
 func favHandler(c *gin.Context) {
 }
@@ -90,7 +93,7 @@ func submitHandler(c *gin.Context) {
 			return
 		}
 		filename := filepath.Base(file.Filename)
-		dest := fmt.Sprintf("./uploads/%s", filename)
+		dest := fmt.Sprintf("%s/%s", uploadDir, filename)
 		log.Printf("Receiving non-chunked file %s", filename)
 		if err := c.SaveUploadedFile(file, dest); err != nil {
 			c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
@@ -117,6 +120,7 @@ func main() {
 	log.Printf("Read configuration...")
 	var port int
 	flag.IntVar(&port, "port", 8080, "Service port (default 8080)")
+	flag.StringVar(&uploadDir, "upload", "./uploads", "Upload directory")
 
 	flag.Parse()
 

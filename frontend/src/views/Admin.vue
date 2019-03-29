@@ -1,6 +1,6 @@
 <template>
   <div class="admin">
-    <h2>Archives Records Transfer System Administration</h2>
+    <h2>Archives Records Transfer System Admin Panel</h2>
   </div>
 </template>
 
@@ -14,10 +14,11 @@ export default {
 div.admin {
   padding: 15px 25px;
   min-height: 600px;
+  background: white;
 }
 h2 {
   margin: 0;
   color:#51822F;
-  font-weight: 500;
+  font-weight: bold;
 }
 </style>
