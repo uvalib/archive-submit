@@ -1,10 +1,10 @@
 <template>
-   <div class="home">
+   <div class="home content">
       <h2>
          <span>University Archives Records Transfer Form</span>
          <span class="admin">
             <router-link to="/admin">
-               <button class="pure-button pure-button-primary">Admin Access</button>
+            <button class="pure-button pure-button-primary">Admin Access</button>
             </router-link>
          </span>
       </h2>
@@ -13,11 +13,9 @@
          <p>Albert & Shirley Small Special Collections Library</p>
          <p>P.O. Box 400110</p>
          <p>Charlottesville, VA, 22904-4110</p>
-         <table>
-            <tr><td class="label">Contact:</td><td>Bethany Anderson, University Archivist</td></tr>
-            <tr><td class="label">Phone:</td><td>(434) 982-2980</td></tr>
-            <tr><td class="label">Email:</td><td><a href="mailto:bga3d@virginia.edu">bga3d@virginia.edu</a></td></tr>
-         </table>
+         <p><span class="label">Contact:</span>Bethany Anderson, University Archivist</p>
+         <p><span class="label">Phone:</span>(434) 982-2980</p>
+         <p><span class="label">Email:</span><a href="mailto:bga3d@virginia.edu">bga3d@virginia.edu</a></p>
       </div>
       <div class="info">
          <p>
@@ -33,9 +31,19 @@
             or information covered by right to privacy laws such as FERPA or HIPPA. For additional information, 
             see 
             <ul>
-               <li>IRM-012: Privacy and Confidentiality of University Information</li>
-               <li>IRM-003: Data Protection of University Information</li>
+               <li>
+                  <a href="https://uvapolicy.virginia.edu/policy/IRM-012" target="_blank">
+                     IRM-012: Privacy and Confidentiality of University Information
+                  </a>
+               </li>
+               <li>
+                  <a href="https://uvapolicy.virginia.edu/policy/IRM-003" target="_blank">
+                     IRM-003: Data Protection of University Information
+                  </a>
+               </li>
             </ul>
+         </p>
+         <p>
             Contact the University Archivist in advance to discuss records containing PII prior to arranging transfer.
          </p>
          <p>
@@ -73,7 +81,7 @@ div.contact{
    color: #444;
    padding: 10px 0 15px 0;
    border-bottom: 1px dashed #EB5F0C;
-   margin-bottom: 20px;
+   margin-bottom: 25px;
 }
 div.contact p {
    margin:0;
@@ -89,19 +97,12 @@ td.label {
    position: relative;
    top: -28px;
 }
-a {
-   color: cornflowerblue;
-   font-weight: 500;
-   text-decoration: none;
-}
 span.admin {
    font-size: 12px;
    position: absolute;
    right: 0;
 }
-a:hover {
- text-decoration: underline;  
-}
+
 div.home {
    position: relative;
    min-width: 1000px;
@@ -115,11 +116,16 @@ div.home {
    font-weight: 400;
    color: #333;
 }
-h2 {
-  margin: 0;
-  color:#51822F;
-  font-weight: bold;
-  position: relative;
+div.info {
+   margin-bottom: 15px;
+}
+span.label {
+   font-weight: bold;
+   color: #666;
+   width: 75px;
+   margin-right: 10px;
+   text-align: right;
+   display: inline-block;
 }
 h3 {
    color:#EB5F0C;
@@ -133,5 +139,13 @@ h3 {
 .access-type label {
    display: block;
    margin: 0 0 10px 25px;
+}
+a {
+   color: cornflowerblue;
+   font-weight: 500;
+   text-decoration: none;
+}
+a:hover {
+ text-decoration: underline;  
 }
 </style>

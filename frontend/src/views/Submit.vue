@@ -1,27 +1,57 @@
 <template>
   <div class="submit">
-    <h2>Archives Records Transfer Form</h2>
-    <vue-dropzone :useCustomSlot=true id="customdropzone" :options="dropzoneOptions">
-      <div class="dropzone-custom">
-        <div class="upload title">Drag and drop to upload content</div>
-        <div class="upload subtitle">or click to select a file from your computer</div>
-      </div>
-    </vue-dropzone>
+    <h2>University Archives Records Transfer Form</h2>
+    <div class="contact-small">
+      <p>University Archives</p>
+      <p>Albert & Shirley Small Special Collections Library, P.O. Box 400110, Charlottesville, VA, 22904-4110</p>
+      <p>Contact: Bethany Anderson, University Archivist, Phone: (434) 982-2980, Email: <a href="mailto:bga3d@virginia.edu">bga3d@virginia.edu</a></p>
+    </div>
+    <form class="pure-form pure-form-stacked">
+      <fieldset>
+        <div class="pure-g">
+          <SubmitterInfo/>
+          <div class="pure-u-1-1 bottom-pad ">
+            <label for="description">Summary Description</label>
+            <span class="note">(e.g., Title, Types of Materials, Nature, Item Relationships, Duplicated/Missing Materials, Personally Identifiable Information)</span>
+            <textarea class="pure-u-1-1" id="description"></textarea>
+          </div>
+          <div class="pure-u-1-1 bottom-pad ">
+            <label for="activities">What were the activities that led to the creation of the records?</label>
+            <textarea class="pure-u-1-1" id="activities"></textarea>
+          </div>
+          <div class="pure-u-1-1 bottom-pad ">
+            <label for="creator">Creator of the records</label>
+            <span class="note">(creating office, department, center, institute, or administrator(s)):</span>
+            <input class="pure-u-1-1" id="activities" type="text"/>
+          </div>
+        </div>
+        <input type="hidden" id="submitted-files" name="submitted-files" data-list="" value="">
+        <vue-dropzone :useCustomSlot=true id="customdropzone" :options="dropzoneOptions">
+          <div class="dropzone-custom">
+            <div class="upload title">Drag and drop to upload content</div>
+            <div class="upload subtitle">or click to select a file from your computer</div>
+          </div>
+        </vue-dropzone>
+      </fieldset>
+    </form>
   </div>
 </template>
 
 <script>
 import vue2Dropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
+import SubmitterInfo from '@/components/SubmitterInfo'
+
 export default {
   name: 'submit',
   components: {
+    SubmitterInfo: SubmitterInfo,
     vueDropzone: vue2Dropzone
   },
   data: function () {
     return {
       dropzoneOptions: {
-        url: '/api/submit',
+        url: '/api/upload',
         createImageThumbnails: false,
         // timeout: null,    no tmimeouts
         // addRemoveLinks: true,
@@ -65,10 +95,27 @@ export default {
 </script>
 
 <style scoped>
-
+a {
+   color: cornflowerblue;
+   font-weight: 500;
+   text-decoration: none;
+}
+a:hover {
+ text-decoration: underline;  
+}
+div.contact-small {
+  font-size: 0.9em;
+  color: #666;
+  border-bottom: 1px dashed #EB5F0C;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+}
+div.contact-small p {
+  margin: 0;
+}
 div.submit {
-  padding: 30px 50px;;
-  min-height: 600px;
+  padding: 30px 50px 250px 50px;
+  height: 100%;
   background: white;
   min-width: 1000px;
   width: 75%;
@@ -76,12 +123,7 @@ div.submit {
   border-right: 1px solid #dfdacc;
   border-left: 1px solid #dfdacc;
   font-weight: 400;
-  color: #333;
-}
-h2 {
-  margin: 0;
-  color:#51822F;
-  font-weight: 500;
+  color: #666;
 }
 div.dropzone-custom {
   color: #666;
@@ -94,5 +136,15 @@ div.upload.title {
 div.upload.subtitle {
   font-weight: 500;
   margin-top: 5px;
+}
+div.bottom-pad {
+  margin-bottom: 10px;
+}
+label.inline {
+  display: inline-block;
+}
+span.note {
+  color: #999;
+  font-size:0.85em;
 }
 </style>

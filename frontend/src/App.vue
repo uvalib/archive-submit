@@ -23,7 +23,7 @@
       }
     },
     created: function () {
-      console.log("CREATED")
+      // console.log("CREATED")
       // auth checks here see also apollo backend handler for authenticate and the auth_middleware
        // if (this.$route.meta.requiresAuth ) {
     //   axios.get("/authenticate").then((response)  =>  {
@@ -57,6 +57,13 @@
     -moz-osx-font-smoothing: grayscale;
     min-height: 100%;
     position:relative;
+  }
+  #app h2 {
+    margin: 0;
+    color:#51822F;
+    font-weight: bold;
+    position: relative;
+    font-size: 24px;
   }
 </style>
 

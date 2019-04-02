@@ -27,7 +27,7 @@ a {
   text-decoration: none;
 }
 div.header span.site-name {
-   margin: 0 15px;
+   margin: 0;
    font-family: "chaparral-pro", Georgia, "Times New Roman", Times, serif;
    font-size: 34px;
    position: relative;
@@ -36,7 +36,7 @@ div.header span.site-name.small {
   color: #bfc9d5;
   font-size: 19px;
   line-height: 19px;
-  margin-bottom: 0.25em;
+  margin-bottom: 0;
   display: block;
 }
 img.uva-library {

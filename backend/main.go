@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -11,13 +10,11 @@ import (
 
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // Version of the service
 const version = "1.0.0"
-
-// Config info
-var uploadDir string
 
 // favHandler is a dummy handler to silence browser API requests that look for /favicon.ico
 func favHandler(c *gin.Context) {
@@ -35,8 +32,8 @@ func healthCheckHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, hcMap)
 }
 
-// submitHandler
-func submitHandler(c *gin.Context) {
+// Upload handles raw file uploads from the front end
+func (svc *ServiceContext) Upload(c *gin.Context) {
 
 	// fmt.Println(header.Filename)
 	// log.Printf("Received request to upload %s; create temp file", filename)
@@ -93,7 +90,7 @@ func submitHandler(c *gin.Context) {
 			return
 		}
 		filename := filepath.Base(file.Filename)
-		dest := fmt.Sprintf("%s/%s", uploadDir, filename)
+		dest := fmt.Sprintf("%s/%s", svc.UploadDir, filename)
 		log.Printf("Receiving non-chunked file %s", filename)
 		if err := c.SaveUploadedFile(file, dest); err != nil {
 			c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
@@ -105,24 +102,17 @@ func submitHandler(c *gin.Context) {
 
 }
 
-// testHandler
-func testHandler(c *gin.Context) {
-	c.String(http.StatusOK, "TEST PASSED")
-}
-
 /**
  * MAIN
  */
 func main() {
 	log.Printf("===> Archive Submission System staring up <===")
 
-	// Get config params; service port and redis info
-	log.Printf("Read configuration...")
-	var port int
-	flag.IntVar(&port, "port", 8080, "Service port (default 8080)")
-	flag.StringVar(&uploadDir, "upload", "./uploads", "Upload directory")
-
-	flag.Parse()
+	// Get config params; service port, directories, DB
+	cfg := ServiceConfig{}
+	cfg.load()
+	svc := ServiceContext{}
+	svc.Init(&cfg)
 
 	log.Printf("Setup routes...")
 	gin.SetMode(gin.ReleaseMode)
@@ -133,8 +123,7 @@ func main() {
 	router.GET("/healthcheck", healthCheckHandler)
 	api := router.Group("/api")
 	{
-		api.POST("/submit", submitHandler)
-		api.GET("/test", testHandler)
+		api.POST("/upload", svc.Upload)
 	}
 	router.Use(static.Serve("/", static.LocalFile("./public", true)))
 
@@ -145,7 +134,7 @@ func main() {
 		c.File("./public/index.html")
 	})
 
-	portStr := fmt.Sprintf(":%d", port)
+	portStr := fmt.Sprintf(":%d", cfg.Port)
 	log.Printf("Start service v%s on port %s", version, portStr)
 	log.Fatal(router.Run(portStr))
 }
