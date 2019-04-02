@@ -16,7 +16,8 @@ type ServiceConfig struct {
 	UploadDir string
 }
 
-func (cfg *ServiceConfig) load() {
+// Load will load the service configuration from env/cmdline
+func (cfg *ServiceConfig) Load() {
 	log.Printf("Loading configuration...")
 
 	flag.StringVar(&cfg.DBHost, "dbhost", "", "DB Host (required)")
