@@ -84,10 +84,12 @@ func (svc *ServiceContext) UploadFile(c *gin.Context) {
 		filename := header.Filename
 		log.Printf("Received CHUNKED request to upload %s, chunk %s size %s", filename, chunkIdx, c.PostForm("dzchunksize"))
 		dest := fmt.Sprintf("%s/%s", uploadDir, filename)
-		if _, err := os.Stat(dest); err == nil {
-			log.Printf("ERROR: File %s already exists", dest)
-			c.String(http.StatusConflict, fmt.Sprintf("File %s already exists", dest))
-			return
+		if chunkIdx == "0" {
+			if _, err := os.Stat(dest); err == nil {
+				log.Printf("ERROR: File %s already exists", dest)
+				c.String(http.StatusConflict, fmt.Sprintf("File %s already exists", dest))
+				return
+			}
 		}
 		outFile, err := os.OpenFile(dest, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0777)
 		if err != nil {
