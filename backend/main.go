@@ -47,6 +47,7 @@ func main() {
 	{
 		api.GET("/genres", svc.GetGenres)
 		api.POST("/upload", svc.UploadFile)
+		api.DELETE("/upload/:file", svc.DeleteUploadedFile)
 		api.GET("/identifier", svc.GetSubmissionIdentifier)
 	}
 

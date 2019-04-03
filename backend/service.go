@@ -86,9 +86,8 @@ func (svc *ServiceContext) UploadFile(c *gin.Context) {
 		dest := fmt.Sprintf("%s/%s", uploadDir, filename)
 		if chunkIdx == "0" {
 			if _, err := os.Stat(dest); err == nil {
-				log.Printf("ERROR: File %s already exists", dest)
-				c.String(http.StatusConflict, fmt.Sprintf("File %s already exists", dest))
-				return
+				log.Printf("WARN: File %s already exists; removing", dest)
+				os.Remove(dest)
 			}
 		}
 		outFile, err := os.OpenFile(dest, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0777)
@@ -107,9 +106,8 @@ func (svc *ServiceContext) UploadFile(c *gin.Context) {
 		filename := filepath.Base(file.Filename)
 		dest := fmt.Sprintf("%s/%s", uploadDir, filename)
 		if _, err := os.Stat(dest); err == nil {
-			log.Printf("ERROR: File %s already exists", dest)
-			c.String(http.StatusConflict, fmt.Sprintf("File %s already exists", dest))
-			return
+			log.Printf("WARN: File %s already exists; removing", dest)
+			os.Remove(dest)
 		}
 		log.Printf("Receiving non-chunked file %s", filename)
 		if err := c.SaveUploadedFile(file, dest); err != nil {
@@ -119,5 +117,26 @@ func (svc *ServiceContext) UploadFile(c *gin.Context) {
 		log.Printf("Done receiving %s", filename)
 		c.String(http.StatusOK, "Submitted")
 	}
+}
 
+// DeleteUploadedFile will remove a temporary upload file
+func (svc *ServiceContext) DeleteUploadedFile(c *gin.Context) {
+	tgtFile := c.Param("file")
+	uploadID := c.Query("key")
+	tgt := fmt.Sprintf("%s/%s/%s", svc.UploadDir, uploadID, tgtFile)
+	log.Printf("Request to delete %s", tgt)
+	if _, err := os.Stat(tgt); err == nil {
+		delErr := os.Remove(tgt)
+		if delErr != nil {
+			log.Printf("WARN: Unable to delete %s: %s", tgt, delErr.Error())
+			c.String(http.StatusInternalServerError, delErr.Error())
+			return
+		}
+	} else {
+		log.Printf("WARN: Target file %s does not exist", tgt)
+		c.String(http.StatusNotFound, "% not found", tgtFile)
+		return
+	}
+	log.Printf("Deleted %s", tgt)
+	c.String(http.StatusOK, "deleted %s", tgtFile)
 }

@@ -66,10 +66,12 @@ export default {
   },
   methods: {
     fileAddedEvent (file, response) {
+      // just adds filename to store list 
       this.$store.commit("addUploadedFile",file.name)
     },
     fileRemovedEvent (file, error, xhr) {
-      this.$store.commit("removeUploadedFile",file.name)
+      // makes an ajax call to the service to remove the file
+      this.$store.dispatch("removeUploadedFile",file.name)
     },
     sendingEvent (file, xhr, formData) {
       formData.append('identifier', this.$store.getters.identifier);
