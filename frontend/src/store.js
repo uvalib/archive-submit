@@ -9,7 +9,8 @@ const state = {
   genres: [],
   identifier: null,
   error: null,
-  uploadedFiles: []
+  uploadedFiles: [],
+  isUVA: false
 }
 
 // state getter functions. All are functions that take state as the first param 
@@ -27,7 +28,10 @@ const getters = {
   },
   uploadedFiles: state => {
     return state.uploadedFiles
-  }
+  },
+  isUVA: state => {
+    return state.isUVA
+  },
 }
 
 // Synchronous updates to the state. Can be called directly in components like this:
@@ -37,6 +41,9 @@ const mutations = {
     if (genres) {
       state.genres = genres
     }
+  },
+  setUVA (state, isUVA) {
+    state.isUVA = isUVA
   },
   setError (state, error) {
     state.error = error

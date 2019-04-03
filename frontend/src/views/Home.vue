@@ -55,24 +55,44 @@
       <div class="access-type">
          <h3>Access the transfer form</h3>
          <label>
-            <input type="radio" name="is_uva" id="uva" value="no" checked="checked">
+            <input @click="uvaStatusClick(true)" type="radio" name="is_uva" id="uva" value="no">
             I am UVA faculty, staff, or student. (You will be asked to verify your identity using 
             <a href="http://itc.virginia.edu/netbadge/">NetBadge</a>.)
          </label>
          <label>
-            <input type="radio" name="is_uva" id="guest" value="yes" checked="checked">
+            <input @click="uvaStatusClick(false)" type="radio" name="is_uva" id="guest" value="yes" checked>
             I am not affiliated with UVA.
          </label>
-         <router-link to="/submit">
-            <button id="continue-btn" class="pure-button pure-button-primary">Continue</button>
-         </router-link>
+         <button @click="continueClicked" id="continue-btn" class="pure-button pure-button-primary">Continue</button>
       </div>
    </div>
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'home',
+  methods: {
+     uvaStatusClick: function(status) {
+        this.$store.commit("setUVA",status)
+     },
+     continueClicked: function (event)  {
+        if (this.$store.getters.isUVA == false) {
+           this.$router.push("submit")
+           return 
+        }
+        axios.post("/authenticate").then((response)  =>  {
+            if (response.status == 200 ) {
+               // TODO accept user info response and populate store
+               this.$router.push("submit")
+            } else {
+               this.$router.push("forbidden")
+            }
+         }).catch( error => {
+            this.$router.push("forbidden")
+         })
+     }
+  }
 }
 </script>
 

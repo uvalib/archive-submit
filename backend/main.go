@@ -43,6 +43,7 @@ func main() {
 	router := gin.Default()
 	router.GET("/version", versionHandler)
 	router.GET("/healthcheck", healthCheckHandler)
+	router.POST("/authenticate", svc.Authenticate)
 	api := router.Group("/api")
 	{
 		api.GET("/genres", svc.GetGenres)

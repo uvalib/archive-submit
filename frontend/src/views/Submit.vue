@@ -65,11 +65,11 @@ export default {
     this.$store.dispatch('getIdentifier')
   },
   methods: {
-    fileAddedEvent (file, response) {
+    fileAddedEvent (file) {
       // just adds filename to store list 
       this.$store.commit("addUploadedFile",file.name)
     },
-    fileRemovedEvent (file, error, xhr) {
+    fileRemovedEvent (file) {
       // makes an ajax call to the service to remove the file
       this.$store.dispatch("removeUploadedFile",file.name)
     },
