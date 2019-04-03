@@ -123,6 +123,7 @@ div.submit {
   border-right: 1px solid #dfdacc;
   border-left: 1px solid #dfdacc;
   font-weight: 400;
+  font-size: 0.9em;
   color: #666;
 }
 div.dropzone-custom {
