@@ -13,7 +13,8 @@
           <GeneralInfo/>
         </div>
         <input type="hidden" id="submitted-files" name="submitted-files" data-list="" value="">
-        <vue-dropzone :useCustomSlot=true id="customdropzone" :options="dropzoneOptions">
+        <vue-dropzone :useCustomSlot=true id="customdropzone" 
+          :options="dropzoneOptions" v-on:vdropzone-sending="sendingEvent">
           <div class="dropzone-custom">
             <div class="upload title">Drag and drop to upload content</div>
             <div class="upload subtitle">or click to select a file from your computer</div>
@@ -52,17 +53,15 @@ export default {
     }
   },
   computed: {
-    hasErrors: function() {
-      return this.$store.getters.error != null
-    },
-    error: function() {
-      return this.$store.getters.error
-    }
   },
   created: function () {
     this.$store.dispatch('getGenres')
+    this.$store.dispatch('getIdentifier')
   },
   methods: {
+    sendingEvent (file, xhr, formData) {
+      formData.append('identifier', this.$store.getters.identifier);
+    },
     template: function () {
         return `<div class="dz-preview dz-file-preview" style="width:100px; margin:  5px;">
           <style type="text/css">

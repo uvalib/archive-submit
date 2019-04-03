@@ -47,6 +47,7 @@ func main() {
 	{
 		api.GET("/genres", svc.GetGenres)
 		api.POST("/upload", svc.UploadFile)
+		api.GET("/identifier", svc.GetSubmissionIdentifier)
 	}
 
 	// Note: in dev mode, this is never actually used. The front end is served

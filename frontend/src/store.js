@@ -7,6 +7,7 @@ Vue.use(Vuex)
 // root state object. Holds all of the state for the system
 const state = {
   genres: [],
+  identifier: null,
   error: null
 }
 
@@ -14,6 +15,10 @@ const state = {
 // and the getters themselves as the second param. Getter params are passed 
 // as a function. Access as a property like: this.$store.getters.NAME
 const getters = {
+  identifier: state => {
+    return state.identifier
+  },
+
   genres: state => {
     return state.genres
   },
@@ -34,6 +39,10 @@ const mutations = {
 
   setError (state, error) {
     state.error = error
+  },
+
+  setIdentifier (state, identifier) {
+    state.identifier = identifier
   }
 }
 
@@ -52,6 +61,19 @@ const actions = {
       }
     }).catch(() => {
       ctx.commit('setGenres', []) 
+      ctx.commit('setError', "Internal Error: Unable to reach any services") 
+    })
+  },
+  getIdentifier( ctx ) {
+    axios.get("/api/identifier").then((response)  =>  {
+      if ( response.status === 200) {
+        ctx.commit('setIdentifier', response.data )
+      } else {
+        ctx.commit('setIdentifier', []) 
+        ctx.commit('setError', "Internal Error: "+response.data) 
+      }
+    }).catch(() => {
+      ctx.commit('setIdentifier', []) 
       ctx.commit('setError', "Internal Error: Unable to reach any services") 
     })
   }
