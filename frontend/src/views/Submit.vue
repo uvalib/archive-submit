@@ -10,20 +10,7 @@
       <fieldset>
         <div class="pure-g">
           <SubmitterInfo/>
-          <div class="pure-u-1-1 bottom-pad ">
-            <label for="description">Summary Description</label>
-            <span class="note">(e.g., Title, Types of Materials, Nature, Item Relationships, Duplicated/Missing Materials, Personally Identifiable Information)</span>
-            <textarea class="pure-u-1-1" id="description"></textarea>
-          </div>
-          <div class="pure-u-1-1 bottom-pad ">
-            <label for="activities">What were the activities that led to the creation of the records?</label>
-            <textarea class="pure-u-1-1" id="activities"></textarea>
-          </div>
-          <div class="pure-u-1-1 bottom-pad ">
-            <label for="creator">Creator of the records</label>
-            <span class="note">(creating office, department, center, institute, or administrator(s)):</span>
-            <input class="pure-u-1-1" id="activities" type="text"/>
-          </div>
+          <GeneralInfo/>
         </div>
         <input type="hidden" id="submitted-files" name="submitted-files" data-list="" value="">
         <vue-dropzone :useCustomSlot=true id="customdropzone" :options="dropzoneOptions">
@@ -41,11 +28,13 @@
 import vue2Dropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 import SubmitterInfo from '@/components/SubmitterInfo'
+import GeneralInfo from '@/components/GeneralInfo'
 
 export default {
   name: 'submit',
   components: {
     SubmitterInfo: SubmitterInfo,
+    GeneralInfo: GeneralInfo,
     vueDropzone: vue2Dropzone
   },
   data: function () {
@@ -61,6 +50,17 @@ export default {
         previewTemplate: this.template()
       }
     }
+  },
+  computed: {
+    hasErrors: function() {
+      return this.$store.getters.error != null
+    },
+    error: function() {
+      return this.$store.getters.error
+    }
+  },
+  created: function () {
+    this.$store.dispatch('getGenres')
   },
   methods: {
     template: function () {
@@ -136,15 +136,5 @@ div.upload.title {
 div.upload.subtitle {
   font-weight: 500;
   margin-top: 5px;
-}
-div.bottom-pad {
-  margin-bottom: 10px;
-}
-label.inline {
-  display: inline-block;
-}
-span.note {
-  color: #999;
-  font-size:0.85em;
 }
 </style>
