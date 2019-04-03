@@ -13,10 +13,6 @@ import (
 // Version of the service
 const version = "1.0.0"
 
-// favHandler is a dummy handler to silence browser API requests that look for /favicon.ico
-func favHandler(c *gin.Context) {
-}
-
 // versionHandler reports the version of the serivce
 func versionHandler(c *gin.Context) {
 	c.String(http.StatusOK, "Archives Transfer Service version %s", version)
@@ -45,7 +41,6 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	gin.DisableConsoleColor()
 	router := gin.Default()
-	router.GET("/favicon.ico", favHandler)
 	router.GET("/version", versionHandler)
 	router.GET("/healthcheck", healthCheckHandler)
 	api := router.Group("/api")
