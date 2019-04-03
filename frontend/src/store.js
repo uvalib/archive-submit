@@ -8,7 +8,8 @@ Vue.use(Vuex)
 const state = {
   genres: [],
   identifier: null,
-  error: null
+  error: null,
+  uploadedFiles: []
 }
 
 // state getter functions. All are functions that take state as the first param 
@@ -18,13 +19,14 @@ const getters = {
   identifier: state => {
     return state.identifier
   },
-
   genres: state => {
     return state.genres
   },
-
   error: state => {
     return state.error
+  },
+  uploadedFiles: state => {
+    return state.uploadedFiles
   }
 }
 
@@ -36,13 +38,20 @@ const mutations = {
       state.genres = genres
     }
   },
-
   setError (state, error) {
     state.error = error
   },
-
   setIdentifier (state, identifier) {
     state.identifier = identifier
+  },
+  addUploadedFile (state, filename) {
+    state.uploadedFiles.push(filename)
+  },
+  removeUploadedFile (state, filename) {
+    let index = state.uploadedFiles.indexOf(filename)
+    if (index !== -1) {
+      state.uploadedFiles.splice(index, 1)
+    }
   }
 }
 

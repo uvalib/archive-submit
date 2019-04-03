@@ -12,9 +12,12 @@
           <SubmitterInfo/>
           <GeneralInfo/>
         </div>
-        <input type="hidden" id="submitted-files" name="submitted-files" data-list="" value="">
+        <input type="hidden" id="submitted-files" name="submitted-files" :value="uploadedFiles">
         <vue-dropzone :useCustomSlot=true id="customdropzone" 
-          :options="dropzoneOptions" v-on:vdropzone-sending="sendingEvent">
+          :options="dropzoneOptions" 
+          v-on:vdropzone-sending="sendingEvent"
+          v-on:vdropzone-success="fileAddedEvent"
+          v-on:vdropzone-removed-file="fileRemovedEvent">
           <div class="dropzone-custom">
             <div class="upload title">Drag and drop to upload content</div>
             <div class="upload subtitle">or click to select a file from your computer</div>
@@ -53,12 +56,21 @@ export default {
     }
   },
   computed: {
+    uploadedFiles: function() {
+      return this.$store.getters.uploadedFiles
+    }
   },
   created: function () {
     this.$store.dispatch('getGenres')
     this.$store.dispatch('getIdentifier')
   },
   methods: {
+    fileAddedEvent (file, response) {
+      this.$store.commit("addUploadedFile",file.name)
+    },
+    fileRemovedEvent (file, error, xhr) {
+      this.$store.commit("removeUploadedFile",file.name)
+    },
     sendingEvent (file, xhr, formData) {
       formData.append('identifier', this.$store.getters.identifier);
     },
