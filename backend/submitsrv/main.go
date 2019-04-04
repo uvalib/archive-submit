@@ -3,27 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql"
 )
 
 // Version of the service
 const version = "1.0.0"
-
-// versionHandler reports the version of the serivce
-func versionHandler(c *gin.Context) {
-	c.String(http.StatusOK, "Archives Transfer Service version %s", version)
-}
-
-// healthCheckHandler reports the health of the serivce
-func healthCheckHandler(c *gin.Context) {
-	hcMap := make(map[string]string)
-	hcMap["alive"] = "true"
-	c.JSON(http.StatusOK, hcMap)
-}
 
 /**
  * MAIN
@@ -41,8 +27,8 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	gin.DisableConsoleColor()
 	router := gin.Default()
-	router.GET("/version", versionHandler)
-	router.GET("/healthcheck", healthCheckHandler)
+	router.GET("/version", svc.GetVersion)
+	router.GET("/healthcheck", svc.HealthCheck)
 	router.POST("/authenticate", svc.Authenticate)
 	api := router.Group("/api")
 	{

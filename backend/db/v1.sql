@@ -65,19 +65,12 @@ CREATE TABLE users (
    title varchar(50) DEFAULT NULL,
    university_affiliation varchar(50) DEFAULT NULL,
    phone varchar(20) DEFAULT NULL,
-   activated boolean default FALSE,
+   verified boolean default FALSE,
    admin boolean default FALSE,
-   netbadge_auth boolean default false,
-   password_hash varchar(50) DEFAULT NULL,
    created_at datetime NOT NULL,
    updated_at datetime NOT NULL,
    UNIQUE KEY (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- Add starter user
-insert into users(last_name,first_name,email,university_affiliation,admin,netbadge_auth,created_at,updated_at)
-   values ("Foster", "Lou", "lf6f@virginia.edu", "UVA", 1,1, NOW(), NOW() );
-
 
 --
 -- Create table for generl accession info
@@ -90,4 +83,19 @@ CREATE TABLE accessions (
    activities text DEFAULT NULL,
    creator text DEFAULT NULL,
    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Create table for inventory items
+--
+DROP TABLE IF EXISTS inventory_items;
+CREATE TABLE inventory_items (
+   id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   accession_id int(11) NOT NULL,
+   box_number varchar(100),
+   record_group_number varchar(100),
+   box_title varchar(255),
+   description text,
+   dates varchar(255),
+   FOREIGN KEY (accession_id) REFERENCES accession(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

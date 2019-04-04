@@ -83,14 +83,14 @@ export default {
         }
         axios.post("/authenticate").then((response)  =>  {
             if (response.status == 200 ) {
-               // TODO accept user info response and populate store
+               this.$store.commit('setUser', response.data)
                this.$router.push("submit")
             } else {
                this.$router.push("forbidden")
             }
-         }).catch( ( /*error*/ ) => {
-            this.$router.push("forbidden")
-         })
+         })//.catch( ( /*error*/ ) => {
+           // this.$router.push("forbidden")
+        // })
      }
   }
 }

@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
 )
 
@@ -29,4 +31,22 @@ func (svc *ServiceContext) Init(cfg *ServiceConfig) {
 		os.Exit(1)
 	}
 	svc.DB = db
+}
+
+// GetVersion reports the version of the serivce
+func (svc *ServiceContext) GetVersion(c *gin.Context) {
+	c.String(http.StatusOK, "Archives Transfer Service version %s", version)
+}
+
+// HealthCheck reports the health of the serivce
+func (svc *ServiceContext) HealthCheck(c *gin.Context) {
+	q := svc.DB.NewQuery("select version from versions order by created_at desc limit 1")
+	var version string
+	err := q.One(&version)
+	if err != nil {
+		// gin.H is a shortcut for map[string]interface{}
+		c.JSON(http.StatusInternalServerError, gin.H{"alive": "true", "mysql": "false"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"alive": "true", "mysql": "true"})
 }

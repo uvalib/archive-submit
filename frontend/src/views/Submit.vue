@@ -62,7 +62,7 @@ export default {
   },
   created: function () {
     this.$store.dispatch('getGenres')
-    this.$store.dispatch('getIdentifier')
+    this.$store.dispatch('getUploadID')
   },
   methods: {
     fileAddedEvent (file) {
@@ -74,7 +74,7 @@ export default {
       this.$store.dispatch("removeUploadedFile",file.name)
     },
     sendingEvent (file, xhr, formData) {
-      formData.append('identifier', this.$store.getters.identifier);
+      formData.append('identifier', this.$store.getters.uploadID);
     },
     template: function () {
         return `<div class="dz-preview dz-file-preview" style="width:100px; margin:  5px;">
