@@ -76,7 +76,7 @@ export default {
      uvaStatusClick: function(status) {
         this.$store.commit("setUVA",status)
      },
-     continueClicked: function (event)  {
+     continueClicked: function (/*event*/)  {
         if (this.$store.getters.isUVA == false) {
            this.$router.push("submit")
            return 
@@ -88,7 +88,7 @@ export default {
             } else {
                this.$router.push("forbidden")
             }
-         }).catch( error => {
+         }).catch( ( /*error*/ ) => {
             this.$router.push("forbidden")
          })
      }
