@@ -19,7 +19,7 @@ CREATE TABLE versions (
 insert into versions(version, created_at) values ("v1", NOW());
 
 --
--- Create table for users
+-- Create table for genres
 --
 DROP TABLE IF EXISTS genres;
 CREATE TABLE genres (
@@ -34,6 +34,26 @@ insert into genres(name)
           ("Manuscripts"), ("Course Material"), ("Biographical Information"), ("Diaries/Journals");
 
 --
+-- Create table for record types
+--
+DROP TABLE IF EXISTS record_types;
+CREATE TABLE record_types (
+   id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   name varchar(30) NOT NULL UNIQUE KEY,
+   description varchar(255) DEFAULT NULL,
+   digital boolean DEFAULT TRUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Add seed types
+insert into record_types(name,description,digital)
+   values ("Text", "(e.g., reports, contracts, email)", 1), ("Images", "(e.g., TIFFs, PDFs)", 1), 
+   ("Video", "(e.g., How-to-videos, event recordings)", 1), ("Audio/Sound Recordings", "(e.g., interviews)", 1),
+   ("Software/Multimedia", "(e.g., SVG, Python)", 1), ("Databases/Data", "(e.g., relational databases, research data)", 1),
+   ("Websites", "(e.g., archived, content-based)", 1), ("Text/Documents", "", 0),
+   ("Photographs/Still Images", "", 0), ("Audio/Video Media", "", 0);
+
+
+--
 -- Create table for users
 --
 DROP TABLE IF EXISTS users;
@@ -42,17 +62,21 @@ CREATE TABLE users (
    last_name varchar(255) DEFAULT NULL,
    first_name varchar(255) DEFAULT NULL,
    email varchar(255) NOT NULL,
-   title varchar(50),
-   university_affiliation varchar(50),
-   phone varchar(20),
+   title varchar(50) DEFAULT NULL,
+   university_affiliation varchar(50) DEFAULT NULL,
+   phone varchar(20) DEFAULT NULL,
+   activated boolean default FALSE,
+   admin boolean default FALSE,
+   netbadge_auth boolean default false,
+   password_hash varchar(50) DEFAULT NULL,
    created_at datetime NOT NULL,
    updated_at datetime NOT NULL,
    UNIQUE KEY (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Add starter user
-insert into users(last_name,first_name,email,university_affiliation,created_at,updated_at)
-   values ("Foster", "Lou", "lf6f@virginia.edu", "UVA", NOW(), NOW() );
+insert into users(last_name,first_name,email,university_affiliation,admin,netbadge_auth,created_at,updated_at)
+   values ("Foster", "Lou", "lf6f@virginia.edu", "UVA", 1,1, NOW(), NOW() );
 
 
 --

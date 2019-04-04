@@ -47,6 +47,7 @@ func main() {
 	api := router.Group("/api")
 	{
 		api.GET("/genres", svc.GetGenres)
+		api.GET("/types", svc.GetTypes)
 		api.POST("/upload", svc.UploadFile)
 		api.DELETE("/upload/:file", svc.DeleteUploadedFile)
 		api.GET("/identifier", svc.GetSubmissionIdentifier)
