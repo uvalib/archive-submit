@@ -46,6 +46,10 @@ export default {
 div.submitter {
    width:100%;
 }
+div.submitter label {
+   color:#666;
+   display: block;
+}
 div.spacing {
    margin-bottom: 10px;
 }

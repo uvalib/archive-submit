@@ -33,10 +33,12 @@ func main() {
 	api := router.Group("/api")
 	{
 		api.GET("/genres", svc.GetGenres)
+		api.GET("/identifier", svc.GetSubmissionIdentifier)
 		api.GET("/types", svc.GetTypes)
 		api.POST("/upload", svc.UploadFile)
 		api.DELETE("/upload/:file", svc.DeleteUploadedFile)
-		api.GET("/identifier", svc.GetSubmissionIdentifier)
+		api.GET("/users/lookup", svc.UserSearch)
+		api.POST("/users", svc.CreateUser)
 	}
 
 	// Note: in dev mode, this is never actually used. The front end is served

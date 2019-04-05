@@ -27,6 +27,9 @@ const getters = {
   error: state => {
     return state.error
   },
+  hasError: state => {
+    return state.error != null && state.error != ""
+  },
   uploadedFiles: state => {
     return state.uploadedFiles
   },

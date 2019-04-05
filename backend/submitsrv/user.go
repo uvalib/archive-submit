@@ -1,7 +1,11 @@
 package main
 
 import (
+	"log"
+	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
 
 	dbx "github.com/go-ozzo/ozzo-dbx"
 )
@@ -38,4 +42,29 @@ func (user *User) Create(db *dbx.DB) error {
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
 	return db.Model(user).Insert()
+}
+
+// UserSearch will find users by a variety of search tearms.
+func (svc *ServiceContext) UserSearch(c *gin.Context) {
+	// Note: currently support just email lookup
+	email := c.Query("email")
+	if email == "" {
+		c.String(http.StatusBadRequest, "missing required email query param")
+		return
+	}
+	log.Printf("Checking for presence of user with email %s", email)
+	user := User{}
+	err := user.FindByEmail(svc.DB, email)
+	if err != nil {
+		log.Printf("%s not found: %s", email, err.Error())
+		c.String(http.StatusNotFound, "%s not found", email)
+		return
+	}
+	log.Printf("%s found", email)
+	c.JSON(http.StatusOK, user)
+}
+
+// CreateUser creates a new user record from data in the post form
+func (svc *ServiceContext) CreateUser(c *gin.Context) {
+	c.String(http.StatusNotImplemented, "not implememted")
 }

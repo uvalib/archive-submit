@@ -16,9 +16,4 @@ div.admin {
   min-height: 600px;
   background: white;
 }
-h2 {
-  margin: 0;
-  color:#51822F;
-  font-weight: bold;
-}
 </style>
