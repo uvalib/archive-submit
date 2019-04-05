@@ -53,6 +53,8 @@ const mutations = {
     state.isUVA = isUVA
   },
   setUser (state, user) {
+    user.affiliation = user.affiliation.replace( /\+/g, ' ' )
+    user.title = user.title.replace( /\+/g, ' ' )
     state.user = user
   },
   setError (state, error) {

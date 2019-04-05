@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,7 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Authenticate will authenticate a user based on Shibboleth headers
+// Authenticate will authenticate a user based on Shibboleth headers, then redirect to other pages for content
+// NOTE: this is called directly from the front-end as a transient page with  window.location.href = "/authenticate"
+// to force it through NetBadge authentication. This route does nothing more than ensure users have been thru
+// authentication and create a user if one does not exist. End result is a redirect.
 func (svc *ServiceContext) Authenticate(c *gin.Context) {
 	log.Printf("Checking authentication headers...")
 	computingID := c.GetHeader("remote_user")
@@ -17,7 +21,6 @@ func (svc *ServiceContext) Authenticate(c *gin.Context) {
 	}
 	if computingID == "" {
 		log.Printf("ERROR: Expected auth header not present in request. Not authorized.")
-		// c.String(http.StatusForbidden, "You are not authorized to access this site")
 		c.Redirect(http.StatusFound, "/forbidden")
 		return
 	}
@@ -37,5 +40,8 @@ func (svc *ServiceContext) Authenticate(c *gin.Context) {
 	}
 
 	log.Printf("Authentication successful for %s", computingID)
+	json, _ := json.Marshal(user)
+	log.Printf(string(json))
+	c.SetCookie("archives_xfer_user", string(json), 3600, "/", "", false, false)
 	c.Redirect(http.StatusFound, "/submit")
 }

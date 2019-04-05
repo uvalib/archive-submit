@@ -19,8 +19,8 @@ type User struct {
 	Affiliation string    `json:"affiliation"  db:"university_affiliation"`
 	Email       string    `json:"email"`
 	Phone       string    `json:"phone"`
-	Verified    bool      `json:"verified"`
-	Admin       bool      `json:"admin"`
+	Verified    bool      `json:"-"`
+	Admin       bool      `json:"-"`
 	CreatedAt   time.Time `db:"created_at" json:"-"`
 	UpdatedAt   time.Time `db:"updated_at" json:"-"`
 }
