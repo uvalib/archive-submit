@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/xid"
 
 	dbx "github.com/go-ozzo/ozzo-dbx"
 )
@@ -13,16 +14,26 @@ import (
 // User maps the users table into a structure
 type User struct {
 	ID          string    `json:"id"`
-	FirstName   string    `json:"firstName" db:"first_name"`
-	LastName    string    `json:"lastName" db:"last_name"`
-	Title       string    `json:"title"`
-	Affiliation string    `json:"affiliation"  db:"university_affiliation"`
-	Email       string    `json:"email"`
-	Phone       string    `json:"phone"`
+	FirstName   string    `json:"firstName" db:"first_name" form:"fname"`
+	LastName    string    `json:"lastName" db:"last_name" form:"lname"`
+	Title       string    `json:"title" form:"title"`
+	Affiliation string    `json:"affiliation"  db:"university_affiliation" form:"affiliation"`
+	Email       string    `json:"email" form:"email"`
+	Phone       string    `json:"phone" form:"phone"`
 	Verified    bool      `json:"-"`
+	VerifyToken string    `json:"-"  db:"verify_token" `
 	Admin       bool      `json:"-"`
 	CreatedAt   time.Time `db:"created_at" json:"-"`
 	UpdatedAt   time.Time `db:"updated_at" json:"-"`
+}
+
+// IsValid makes sure all fields are set and look right
+func (user *User) IsValid() bool {
+	if user.FirstName == "" || user.LastName == "" || user.Title == "" ||
+		user.Affiliation == "" || user.Email == "" || user.Phone == "" {
+		return false
+	}
+	return true
 }
 
 // TableName defines the expected DB table name that holds data for users
@@ -64,7 +75,25 @@ func (svc *ServiceContext) UserSearch(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// CreateUser creates a new user record from data in the post form
+// CreateUser creates a new user record from data in the post form. Mark
 func (svc *ServiceContext) CreateUser(c *gin.Context) {
-	c.String(http.StatusNotImplemented, "not implememted")
+	var user User
+	c.Bind(&user)
+	if user.IsValid() == false {
+		log.Printf("ERROR: Request to create user with missing fields")
+		c.String(http.StatusBadRequest, "All fields are required")
+		return
+	}
+	user.VerifyToken = xid.New().String()
+	err := user.Create(svc.DB)
+	if err != nil {
+		log.Printf("ERROR: User create failed: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// TODO create validate token
+	// TODO send email with link & token
+
+	c.JSON(http.StatusOK, user)
 }

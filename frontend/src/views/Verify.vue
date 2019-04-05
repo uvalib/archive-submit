@@ -10,7 +10,11 @@
          <div class="email-entry pure-form">
             <label>Email Address</label>
             <input type="email" id="email" placeholder="Email">
-            <button @click="checkEmail" type="submit" class="pure-button pure-button-primary">Continue</button>
+            <button
+               @click="checkEmail"
+               type="submit"
+               class="pure-button pure-button-primary"
+            >Continue</button>
          </div>
       </template>
       <template v-else-if="state === 'verified'">
@@ -19,7 +23,7 @@
       <template v-else-if="state === 'register'">
          <h3>This email address has not yet been verified</h3>
          <p>To verify it, please fill out the form below and click 'Verify'.</p>
-         
+
          <div class="user-verify pure-form pure-g">
             <SubmitterInfo/>
          </div>
@@ -29,49 +33,49 @@
          </div>
       </template>
       <template v-else-if="state === 'submitted'">
-         
+         <h3>Thank You!</h3>
+         <p>
+            Your information has been received. A verification email has been sent to the address you provided.
+            <br>Click the link it contains to active your account and access the transfer form.
+         </p>
       </template>
    </div>
 </template>
 
 <script>
 import axios from "axios";
-import SubmitterInfo from '@/components/SubmitterInfo'
-import { mapGetters } from 'vuex'
+import SubmitterInfo from "@/components/SubmitterInfo";
+import { mapGetters } from "vuex";
 export default {
    name: "register",
    components: {
-      SubmitterInfo: SubmitterInfo,
+      SubmitterInfo: SubmitterInfo
    },
    computed: {
-      ...mapGetters([
-         'user',
-         'hasError',
-         'error'
-      ])
+      ...mapGetters(["user", "hasError", "error"])
    },
    data: function() {
       return {
-         state: "verify",
+         state: "verify"
       };
    },
    methods: {
       verifyClicked() {
-         let user = {}
-         user.lastName = document.getElementById("lname").value
-         user.firstName = document.getElementById("fname").value
-         user.title = document.getElementById("title").value
-         user.affiliation = document.getElementById("affiliation").value
-         user.email = document.getElementById("email").value
-         user.phone = document.getElementById("phone").value
+         let user = {};
+         user.lastName = document.getElementById("lname").value;
+         user.firstName = document.getElementById("fname").value;
+         user.title = document.getElementById("title").value;
+         user.affiliation = document.getElementById("affiliation").value;
+         user.email = document.getElementById("email").value;
+         user.phone = document.getElementById("phone").value;
          axios
             .post("/api/users", user)
             .then(response => {
                this.$store.commit("setUser", response.data);
-               this.state = "submitted"
+               this.state = "submitted";
             })
-            .catch((error) => {
-               this.$store.commit("setError", error)
+            .catch(error => {
+               this.$store.commit("setError", error.response.data);
             });
       },
       checkEmail() {
@@ -80,12 +84,13 @@ export default {
          axios
             .get("/api/users/lookup?email=" + email)
             .then(response => {
+               // TODO handle a case where a user exists, but is not verified
                this.$store.commit("setUser", response.data);
-               this.state = "verified"
+               this.state = "verified";
             })
             .catch((/*error*/) => {
-               this.state = "register"
-               this.$store.commit("setUser", {email: email})
+               this.state = "register";
+               this.$store.commit("setUserEmail", email);
             });
       }
    }
@@ -109,13 +114,13 @@ div.register {
 .error-message {
    width: 100%;
    text-align: center;
-   color:firebrick;
+   color: firebrick;
    font-style: italic;
    min-height: 25px;
 }
 div.controls {
    text-align: right;
-   width:100%;
+   width: 100%;
    padding: 15px;
 }
 .email-entry label {

@@ -66,9 +66,11 @@ CREATE TABLE users (
    university_affiliation varchar(50) DEFAULT NULL,
    phone varchar(20) DEFAULT NULL,
    verified boolean default FALSE,
+   verify_token varchar(25), 
    admin boolean default FALSE,
    created_at datetime NOT NULL,
    updated_at datetime NOT NULL,
+   INDEX (verify_token),
    UNIQUE KEY (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

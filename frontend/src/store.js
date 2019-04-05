@@ -57,6 +57,12 @@ const mutations = {
     user.title = user.title.replace( /\+/g, ' ' )
     state.user = user
   },
+  setUserEmail(state, email) {
+    state.user = {firstName: "", lastName:"", title:"", affiliation:"", email:email, phone:""}
+  },
+  clearUser(state) {
+    state.user = {firstName: "", lastName:"", title:"", affiliation:"", email:"", phone:""}
+  },
   setError (state, error) {
     state.error = error
   },

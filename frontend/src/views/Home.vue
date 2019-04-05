@@ -98,6 +98,7 @@ export default {
          this.$store.commit("setUVA", status);
       },
       continueClicked: function(/*event*/) {
+         this.$store.commit("clearUser")
          if (this.$store.getters.isUVA == false) {
             this.$router.push("verify");
          } else {
