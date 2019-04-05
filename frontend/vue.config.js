@@ -10,7 +10,7 @@ module.exports = {
         changeOrigin: true,
         logLevel: 'debug'
       },
-      '/auth': {
+      '/authenticate': {
         target: process.env.SUBMIT_API, // or 'http://localhost:8095',
         changeOrigin: true,
         logLevel: 'debug'

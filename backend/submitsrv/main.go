@@ -29,7 +29,7 @@ func main() {
 	router := gin.Default()
 	router.GET("/version", svc.GetVersion)
 	router.GET("/healthcheck", svc.HealthCheck)
-	router.POST("/auth/verify", svc.Authenticate)
+	router.GET("/authenticate", svc.Authenticate)
 	api := router.Group("/api")
 	{
 		api.GET("/genres", svc.GetGenres)

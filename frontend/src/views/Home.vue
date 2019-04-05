@@ -101,7 +101,7 @@ export default {
          if (this.$store.getters.isUVA == false) {
             this.$router.push("verify");
          } else {
-            this.$router.push("authenticate");
+            window.location.href = "/authenticate"
          }
       }
    }

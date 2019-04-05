@@ -17,7 +17,8 @@ func (svc *ServiceContext) Authenticate(c *gin.Context) {
 	}
 	if computingID == "" {
 		log.Printf("ERROR: Expected auth header not present in request. Not authorized.")
-		c.String(http.StatusForbidden, "You are not authorized to access this site")
+		// c.String(http.StatusForbidden, "You are not authorized to access this site")
+		c.Redirect(http.StatusFound, "/forbidden")
 		return
 	}
 
@@ -36,5 +37,5 @@ func (svc *ServiceContext) Authenticate(c *gin.Context) {
 	}
 
 	log.Printf("Authentication successful for %s", computingID)
-	c.JSON(http.StatusOK, user)
+	c.Redirect(http.StatusFound, "/submit")
 }

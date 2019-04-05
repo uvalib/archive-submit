@@ -5,7 +5,6 @@ import Submit from './views/Submit.vue'
 import Admin from './views/Admin.vue'
 import Forbidden from './views/Forbidden.vue'
 import Verify from './views/Verify.vue'
-import Authenticate from './views/Authenticate.vue'
 
 Vue.use(Router)
 
@@ -22,11 +21,6 @@ export default new Router({
       path: '/submit',
       name: 'submit',
       component: Submit
-    },
-    {
-      path: '/authenticate',
-      name: 'authenticate',
-      component: Authenticate
     },
     {
       path: '/verify',
