@@ -91,7 +91,6 @@
 </template>
 
 <script>
-import axios from "axios";
 export default {
    name: "home",
    methods: {
@@ -101,17 +100,9 @@ export default {
       continueClicked: function(/*event*/) {
          if (this.$store.getters.isUVA == false) {
             this.$router.push("verify");
-            return;
+         } else {
+            this.$router.push("authenticate");
          }
-         axios
-            .post("/authenticate")
-            .then(response => {
-               this.$store.commit("setUser", response.data);
-               this.$router.push("submit");
-            })
-            .catch((/*error*/) => {
-               this.$router.push("forbidden");
-            });
       }
    }
 };
