@@ -36,6 +36,11 @@ func (user *User) IsValid() bool {
 	return true
 }
 
+// SendVerifyEmail will send a verify email to a new user
+func (user *User) SendVerifyEmail(smtpCfg SMTPConfig) {
+
+}
+
 // TableName defines the expected DB table name that holds data for users
 func (user *User) TableName() string {
 	return "users"
@@ -92,8 +97,7 @@ func (svc *ServiceContext) CreateUser(c *gin.Context) {
 		return
 	}
 
-	// TODO create validate token
-	// TODO send email with link & token
+	user.SendVerifyEmail(svc.SMTP)
 
 	c.JSON(http.StatusOK, user)
 }

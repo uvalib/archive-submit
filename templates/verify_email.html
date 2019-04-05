@@ -1,0 +1,22 @@
+<!DOCTYPE html
+   PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+</head>
+
+<body>
+   <p>Hello {{.Name}},</p>
+   <p> 
+      This email address was recently used to request access to the University of Virgina Archives Records Transfer Form.
+      Click the link below to validate and access the form.<br/>
+      <a href="{{.URL}}">Validate email address.</a>
+   </p>
+   <p>
+      If the above link does not work, copy and paste this URL into your browser:<br/>{{.URL}}
+   </p>
+   <p>
+      If you did not make this request, simply ignore this message.
+   </p>
+
+</body>
+
+</html>

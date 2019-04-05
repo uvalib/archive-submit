@@ -6,6 +6,15 @@ import (
 	"os"
 )
 
+// SMTPConfig wraps up all of the smpt configuration
+type SMTPConfig struct {
+	Host    string
+	Port    int
+	User    string
+	Pass    string
+	DevMode bool
+}
+
 // ServiceConfig defines all of the archives transfer service configuration paramaters
 type ServiceConfig struct {
 	DBHost      string
@@ -15,6 +24,7 @@ type ServiceConfig struct {
 	Port        int
 	UploadDir   string
 	DevAuthUser string
+	SMTP        SMTPConfig
 }
 
 // Load will load the service configuration from env/cmdline
@@ -25,6 +35,13 @@ func (cfg *ServiceConfig) Load() {
 	flag.StringVar(&cfg.DBName, "dbname", "", "DB Name (required)")
 	flag.StringVar(&cfg.DBUser, "dbuser", "", "DB User (required)")
 	flag.StringVar(&cfg.DBPass, "dbpass", "", "DB Password (required)")
+
+	flag.StringVar(&cfg.SMTP.Host, "smtphost", "", "SMTP Host")
+	flag.IntVar(&cfg.SMTP.Port, "smtpport", 0, "SMTP Port")
+	flag.StringVar(&cfg.SMTP.User, "smtpuser", "", "SMTP User")
+	flag.StringVar(&cfg.SMTP.Pass, "smtppass", "", "SMTP Password")
+	flag.BoolVar(&cfg.SMTP.DevMode, "stubsmtp", true, "Log email insted of sending (dev mode)")
+
 	flag.StringVar(&cfg.DevAuthUser, "devuser", "", "Authorized computing id for dev")
 	flag.IntVar(&cfg.Port, "port", 8080, "Service port (default 8080)")
 	flag.StringVar(&cfg.UploadDir, "upload", "./uploads", "Upload directory")
