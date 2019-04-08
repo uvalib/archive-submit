@@ -172,11 +172,16 @@ func (svc *ServiceContext) VerifyUser(c *gin.Context) {
 		c.String(http.StatusNotFound, err.Error())
 		return
 	}
-	err = user.Verify(svc.DB)
-	if err != nil {
-		log.Printf("Unable to verify %s: %s", user.Email, err.Error())
-		c.String(http.StatusInternalServerError, err.Error())
-		return
+	if user.Verified == false {
+		log.Printf("Marking %s as verified", user.Email)
+		err = user.Verify(svc.DB)
+		if err != nil {
+			log.Printf("Unable to verify %s: %s", user.Email, err.Error())
+			c.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+	} else {
+		log.Printf("User %s already verified; nothing to do.", user.Email)
 	}
 	c.JSON(http.StatusOK, user)
 }
