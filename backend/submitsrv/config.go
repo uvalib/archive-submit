@@ -41,7 +41,7 @@ func (cfg *ServiceConfig) Load() {
 	flag.IntVar(&cfg.SMTP.Port, "smtpport", 0, "SMTP Port")
 	flag.StringVar(&cfg.SMTP.User, "smtpuser", "", "SMTP User")
 	flag.StringVar(&cfg.SMTP.Pass, "smtppass", "", "SMTP Password")
-	flag.BoolVar(&cfg.SMTP.DevMode, "stubsmtp", true, "Log email insted of sending (dev mode)")
+	flag.BoolVar(&cfg.SMTP.DevMode, "stubsmtp", false, "Log email insted of sending (dev mode)")
 
 	flag.StringVar(&cfg.DevAuthUser, "devuser", "", "Authorized computing id for dev")
 	flag.StringVar(&cfg.Hostname, "host", "transfer-archives.lib.virginia.edu", "Transfer Service Hostname")
