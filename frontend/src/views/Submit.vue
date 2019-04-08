@@ -61,9 +61,11 @@ export default {
     }
   },
   created: function () {
-    let u = this.$cookies.get("archives_xfer_user")
-    this.$store.commit("setUser",u)
-    this.$cookies.remove("archives_xfer_user")
+    let authUser = this.$cookies.get("archives_xfer_user")
+    if (authUser) {
+      this.$store.commit("setUser",authUser)
+      this.$cookies.remove("archives_xfer_user")
+    }
     this.$store.dispatch('getGenres')
     this.$store.dispatch('getUploadID')
   },

@@ -39,6 +39,8 @@ func main() {
 		api.DELETE("/upload/:file", svc.DeleteUploadedFile)
 		api.GET("/users/lookup", svc.UserSearch)
 		api.POST("/users", svc.CreateUser)
+		api.POST("/verify/:token", svc.VerifyUser)
+		api.POST("/resend/verification", svc.ResendVerification)
 	}
 
 	// Note: in dev mode, this is never actually used. The front end is served

@@ -24,8 +24,8 @@ type User struct {
 	Affiliation string    `json:"affiliation"  db:"university_affiliation" form:"affiliation"`
 	Email       string    `json:"email" form:"email"`
 	Phone       string    `json:"phone" form:"phone"`
-	Verified    bool      `json:"-"`
-	VerifyToken string    `json:"-"  db:"verify_token" `
+	Verified    bool      `json:"verified"`
+	VerifyToken string    `json:"token"  db:"verify_token" `
 	Admin       bool      `json:"-"`
 	CreatedAt   time.Time `db:"created_at" json:"-"`
 	UpdatedAt   time.Time `db:"updated_at" json:"-"`
@@ -91,8 +91,17 @@ func (user *User) TableName() string {
 
 // FindByEmail finds a user by email
 func (user *User) FindByEmail(db *dbx.DB, email string) error {
-	q := db.NewQuery("select id,last_name,first_name,email,title,university_affiliation,phone from users where email={:email} limit 1")
+	q := db.NewQuery(`select id,last_name,first_name,email,title,university_affiliation,
+		phone,verified,verify_token from users where email={:email} limit 1`)
 	q.Bind(dbx.Params{"email": email})
+	return q.One(user)
+}
+
+// FindByToken finds a user by verfy_token
+func (user *User) FindByToken(db *dbx.DB, token string) error {
+	q := db.NewQuery(`select id,last_name,first_name,email,title,university_affiliation,
+		phone,verified,verify_token from users where verify_token={:token} limit 1`)
+	q.Bind(dbx.Params{"token": token})
 	return q.One(user)
 }
 
@@ -101,6 +110,13 @@ func (user *User) Create(db *dbx.DB) error {
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
 	return db.Model(user).Insert()
+}
+
+// Verify will mark this user account as verified
+func (user *User) Verify(db *dbx.DB) error {
+	user.Verified = true
+	user.UpdatedAt = time.Now()
+	return db.Model(user).Update()
 }
 
 // UserSearch will find users by a variety of search tearms.
@@ -143,4 +159,41 @@ func (svc *ServiceContext) CreateUser(c *gin.Context) {
 	user.SendVerifyEmail(svc.Hostname, svc.SMTP)
 
 	c.JSON(http.StatusOK, user)
+}
+
+// VerifyUser accepts a token, finds the assiciated user and marks them as validated
+func (svc *ServiceContext) VerifyUser(c *gin.Context) {
+	token := c.Param("token")
+	log.Printf("Verify user with token [%s]", token)
+	user := User{}
+	err := user.FindByToken(svc.DB, token)
+	if err != nil {
+		log.Printf("ERROR: No user found for %s: %s", token, err.Error())
+		c.String(http.StatusNotFound, err.Error())
+		return
+	}
+	err = user.Verify(svc.DB)
+	if err != nil {
+		log.Printf("Unable to verify %s: %s", user.Email, err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
+// ResendVerification accepts a token, finds the associated user, and resends the validation email
+func (svc *ServiceContext) ResendVerification(c *gin.Context) {
+	var data struct{ Token string }
+	c.Bind(&data)
+	log.Printf("Resend verification for [%s]", data.Token)
+	user := User{}
+	err := user.FindByToken(svc.DB, data.Token)
+	if err != nil {
+		log.Printf("ERROR: No user found for %s: %s", data.Token, err.Error())
+		c.String(http.StatusNotFound, err.Error())
+		return
+	}
+	log.Printf("[%s] found; resending verification email", data.Token)
+	user.SendVerifyEmail(svc.Hostname, svc.SMTP)
+	c.String(http.StatusOK, "email resent")
 }

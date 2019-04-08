@@ -1,104 +1,62 @@
 <template>
-   <div class="register">
+   <div class="verify">
       <h2>University Archives Records Transfer Form</h2>
       <template v-if="state === 'verify'">
+          <h3>Verifying</h3>
          <p>
-            To access the transfer form, please enter your email below.
-            <br>If the address has not
-            yet been verified, you will be walked through the verification process.
+            Verifying your account...
          </p>
-         <div class="email-entry pure-form">
-            <label>Email Address</label>
-            <input type="email" id="email" placeholder="Email">
-            <button
-               @click="checkEmail"
-               type="submit"
-               class="pure-button pure-button-primary"
-            >Continue</button>
-         </div>
+      </template>
+      <template v-else-if="state === 'failed'">
+         <h3>Failed verification</h3>
+         <p>
+            Account verification failed with the following response:
+            <br/><span class="error-message">{{ verifyError }}</span>
+         </p>
       </template>
       <template v-else-if="state === 'verified'">
-         <h2>Verified</h2>
-      </template>
-      <template v-else-if="state === 'register'">
-         <h3>This email address has not yet been verified</h3>
-         <p>To verify it, please fill out the form below and click 'Verify'.</p>
-
-         <div class="user-verify pure-form pure-g">
-            <SubmitterInfo/>
-         </div>
-         <div class="error-message">{{ error }}</div>
-         <div class="controls">
-            <button @click="verifyClicked" class="pure-button pure-button-primary verify">Verify</button>
-         </div>
-      </template>
-      <template v-else-if="state === 'submitted'">
-         <h3>Thank You!</h3>
-         <p>
-            Your information has been received. A verification email has been sent to the address you provided.
-            <br>Click the link it contains to active your account and access the transfer form.
-         </p>
+         <h3>Account Verified</h3>
+         <p>You account has been verified. Click the 'Continue' button below to access the transfer form</p>
+         <button @click="continueClicked" class="pure-button pure-button-primary">Continue</button>
       </template>
    </div>
 </template>
 
 <script>
-import axios from "axios";
-import SubmitterInfo from "@/components/SubmitterInfo";
-import { mapGetters } from "vuex";
+import axios from "axios"
 export default {
-   name: "register",
+   name: "verify",
    components: {
-      SubmitterInfo: SubmitterInfo
-   },
-   computed: {
-      ...mapGetters(["user", "hasError", "error"])
    },
    data: function() {
       return {
-         state: "verify"
+         state: "verify",
+         verifyError: null
       };
    },
+   created: function () {
+      let token = this.$route.params.token
+      axios
+         .post("/api/verify/"+token)
+         .then((response) => {
+            this.state = "verified"
+            this.$store.commit("setUser", response.data)
+         })
+         .catch(error => {
+            this.state = "failed"
+            this.verifyError =  error.response.data
+         })
+   },
    methods: {
-      verifyClicked() {
-         let user = {};
-         user.lastName = document.getElementById("lname").value;
-         user.firstName = document.getElementById("fname").value;
-         user.title = document.getElementById("title").value;
-         user.affiliation = document.getElementById("affiliation").value;
-         user.email = document.getElementById("email").value;
-         user.phone = document.getElementById("phone").value;
-         axios
-            .post("/api/users", user)
-            .then(response => {
-               this.$store.commit("setUser", response.data);
-               this.state = "submitted";
-            })
-            .catch(error => {
-               this.$store.commit("setError", error.response.data);
-            });
-      },
-      checkEmail() {
-         let emailInput = document.getElementById("email");
-         let email = emailInput.value;
-         axios
-            .get("/api/users/lookup?email=" + email)
-            .then(response => {
-               // TODO handle a case where a user exists, but is not verified
-               this.$store.commit("setUser", response.data);
-               this.state = "verified";
-            })
-            .catch((/*error*/) => {
-               this.state = "register";
-               this.$store.commit("setUserEmail", email);
-            });
+      continueClicked() {
+         this.$router.push("/submit")
       }
    }
 };
 </script>
 
 <style scoped>
-div.register {
+div.verify {
    position: relative;
    min-width: 1000px;
    padding: 30px 50px 250px 50px;
@@ -122,12 +80,5 @@ div.controls {
    text-align: right;
    width: 100%;
    padding: 15px;
-}
-.email-entry label {
-   display: block;
-}
-#email {
-   width: 300px;
-   margin-right: 5px;
 }
 </style>
