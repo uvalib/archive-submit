@@ -24,6 +24,7 @@ type ServiceConfig struct {
 	Port        int
 	UploadDir   string
 	DevAuthUser string
+	Hostname    string
 	SMTP        SMTPConfig
 }
 
@@ -43,6 +44,7 @@ func (cfg *ServiceConfig) Load() {
 	flag.BoolVar(&cfg.SMTP.DevMode, "stubsmtp", true, "Log email insted of sending (dev mode)")
 
 	flag.StringVar(&cfg.DevAuthUser, "devuser", "", "Authorized computing id for dev")
+	flag.StringVar(&cfg.Hostname, "host", "transfer-archives.lib.virginia.edu", "Transfer Service Hostname")
 	flag.IntVar(&cfg.Port, "port", 8080, "Service port (default 8080)")
 	flag.StringVar(&cfg.UploadDir, "upload", "./uploads", "Upload directory")
 

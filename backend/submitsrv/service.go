@@ -14,6 +14,7 @@ import (
 type ServiceContext struct {
 	UploadDir   string
 	DevAuthUser string
+	Hostname    string
 	DB          *dbx.DB
 	SMTP        SMTPConfig
 }
@@ -23,6 +24,7 @@ func (svc *ServiceContext) Init(cfg *ServiceConfig) {
 	log.Printf("Initializing Service...")
 	svc.UploadDir = cfg.UploadDir
 	svc.DevAuthUser = cfg.DevAuthUser
+	svc.Hostname = cfg.Hostname
 	svc.SMTP = cfg.SMTP
 
 	log.Printf("Init DB connection to %s...", cfg.DBHost)

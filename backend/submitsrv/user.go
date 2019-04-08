@@ -1,8 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
+	"html/template"
 	"log"
 	"net/http"
+	"net/smtp"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,9 +40,48 @@ func (user *User) IsValid() bool {
 	return true
 }
 
-// SendVerifyEmail will send a verify email to a new user
-func (user *User) SendVerifyEmail(smtpCfg SMTPConfig) {
+// FullName return the full name of the user
+func (user *User) FullName() string {
+	return fmt.Sprintf("%s %s", user.FirstName, user.LastName)
+}
 
+// SendVerifyEmail will send a verify email to a new user
+func (user *User) SendVerifyEmail(baseURL string, smtpCfg SMTPConfig) {
+	log.Printf("Rendering verification email body")
+	var renderedEmail bytes.Buffer
+	var data struct {
+		Name string
+		URL  string
+	}
+	data.Name = user.FullName()
+	data.URL = fmt.Sprintf("https://%s/verify/%s", baseURL, user.VerifyToken)
+	tpl := template.Must(template.ParseFiles("templates/verify_email.html"))
+	err := tpl.Execute(&renderedEmail, data)
+	if err != nil {
+		log.Printf("ERROR: Unable to render verify email: %s", err.Error())
+		return
+	}
+
+	log.Printf("Generate SMTP message")
+	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	subject := "Subject: UVA Archives Transfer Verification\n"
+	to := fmt.Sprintf("To: %s\n", user.Email)
+	msg := []byte(subject + to + mime + renderedEmail.String())
+
+	if smtpCfg.DevMode {
+		log.Printf("Email is in dev mode. Logging message instead of sending")
+		log.Printf("==================================================")
+		log.Printf("%s", msg)
+		log.Printf("==================================================")
+	} else {
+		log.Printf("Send verify email to %s", user.Email)
+		to := []string{user.Email}
+		err := smtp.SendMail(fmt.Sprintf("%s:%d", smtpCfg.Host, smtpCfg.Port), nil, "no-reply@virginia.edu", to, msg)
+		if err != nil {
+			log.Printf("ERROR: Unable to send verify email: %s", err.Error())
+			return
+		}
+	}
 }
 
 // TableName defines the expected DB table name that holds data for users
@@ -97,7 +140,7 @@ func (svc *ServiceContext) CreateUser(c *gin.Context) {
 		return
 	}
 
-	user.SendVerifyEmail(svc.SMTP)
+	user.SendVerifyEmail(svc.Hostname, svc.SMTP)
 
 	c.JSON(http.StatusOK, user)
 }
