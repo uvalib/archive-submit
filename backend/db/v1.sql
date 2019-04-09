@@ -31,7 +31,8 @@ CREATE TABLE genres (
 -- Add seed genres
 insert into genres(name)
    values ("Correspondence"), ("Reports"), ("Publications"), ("Speeches/Lectures"), ("Research Data"), 
-          ("Manuscripts"), ("Course Material"), ("Biographical Information"), ("Diaries/Journals");
+          ("Manuscripts"), ("Course Material"), ("Biographical Information"), ("Diaries/Journals"),
+          ("Social Media Content"), ("Websites");
 
 --
 -- Create table for record types

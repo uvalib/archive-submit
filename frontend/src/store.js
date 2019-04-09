@@ -11,7 +11,9 @@ const state = {
   error: null,
   uploadedFiles: [],
   isUVA: false,
-  user: null
+  user: null,
+  digitalTransfer: true,
+  physicalTransfer: false
 }
 
 // state getter functions. All are functions that take state as the first param 
@@ -38,6 +40,12 @@ const getters = {
   },
   user: state => {
     return state.user
+  },
+  digitalTransfer: state => {
+    return state.digitalTransfer
+  },
+  physicalTransfer: state => {
+    return state.physicalTransfer
   },
 }
 
@@ -77,7 +85,15 @@ const mutations = {
     if (index !== -1) {
       state.uploadedFiles.splice(index, 1)
     }
-  }
+  },
+  setDigitalTransfer(state, digital) {
+    console.log("SET DIGITAL TO "+digital)
+    state.digitalTransfer = digital
+  },
+  setPhysicalTransfer(state, physical) {
+    console.log("SET PHYSICAL TO "+physical)
+    state.physicalTransfer = physical
+  },
 }
 
 // Actions are asynchronous calls that commit mutatations to the state.
@@ -111,9 +127,9 @@ const actions = {
       ctx.commit('setError', "Internal Error: Unable to reach any services") 
     })
   },
-  removeUploadedFile( ctx, filename ) {
+  removeUploadedFile( ctx, filename ) { 
     ctx.commit("removeUploadedFile",filename)
-    axios.delete("/api/upload/"+filename+"?key="+ctx.getters.identifier)
+    axios.delete("/api/upload/"+filename+"?key="+ctx.getters.uploadID)
   }
 }
 

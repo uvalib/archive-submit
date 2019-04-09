@@ -63,45 +63,59 @@
       </div>
       <div class="access-type">
          <h3>Access the transfer form</h3>
+         <h4>Affiliation</h4>
          <label>
-            <input @click="uvaStatusClick(true)" type="radio" name="is_uva" id="uva" value="no">
+            <input @click="uvaStatusClick(true)" type="radio" name="is_uva" value="no">
             I am UVA faculty, staff, or student. (You will be asked to verify your identity using
-            <a
-               href="http://itc.virginia.edu/netbadge/"
-            >NetBadge</a>.)
+            <a href="http://itc.virginia.edu/netbadge/">NetBadge</a>.)
          </label>
          <label>
-            <input
-               @click="uvaStatusClick(false)"
-               type="radio"
-               name="is_uva"
-               id="guest"
-               value="yes"
-               checked
-            >
+            <input @click="uvaStatusClick(false)" type="radio" name="is_uva"  value="yes" checked>
             I am not affiliated with UVA.
          </label>
-         <button
-            @click="continueClicked"
-            id="continue-btn"
-            class="pure-button pure-button-primary"
-         >Continue</button>
+         <h4 class="gap">Type of records transfer (check one or both)</h4>
+         <label>
+            <input type="checkbox" id="physical">
+            I want to transfer physical materials (paper-based, other analog, and/or digital media carriers)
+         </label>
+         <label>
+            <input type="checkbox" id="digital" checked>
+            I want to transfer born-digital materials via upload through this form
+         </label>
+         <div class="error-message">{{ error }}</div>
+         <button id="continue-btn" @click="continueClicked" class="pure-button pure-button-primary">Continue</button>
       </div>
    </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 export default {
    name: "home",
+   computed: {
+      ...mapGetters(["hasError", "error"])
+   },
    methods: {
       uvaStatusClick: function(status) {
          this.$store.commit("setUVA", status)
       },
       continueClicked: function(/*event*/) {
+         let digital = document.getElementById("digital").checked  
+         let physical = document.getElementById("physical").checked  
+         if (!physical && !digital) {
+            this.$store.commit("setError", "Please select at least one type of record to transfer")
+            return
+         }
+         this.$store.commit("setPhysicalTransfer", physical)
+         this.$store.commit("setDigitalTransfer", digital)
          this.$store.commit("clearUser")
          if (this.$store.getters.isUVA == false) {
             this.$router.push("access")
          } else {
+            // This redirect to a page not under vue control resets 
+            // state held in vuex. Need to persist key bits in a cookie 
+            // for retrieval after the auth redirects happen
+            this.$cookies.set("archives_xfer_settings", {physical: physical, digital: digital})
             window.location.href = "/authenticate"
          }
       }
@@ -166,6 +180,13 @@ h3 {
    padding-bottom: 5px;
    font-size: 1.3em;
 }
+h4 {
+   margin:5px 0;
+   color:#555;
+}
+h4.gap {
+   margin-top: 15px;
+}
 .access-type input {
    margin-right: 10px;
 }
@@ -180,5 +201,12 @@ a {
 }
 a:hover {
    text-decoration: underline;
+}
+.error-message {
+   width: 100%;
+   text-align: center;
+   color: firebrick;
+   font-style: italic;
+   min-height: 25px;
 }
 </style>
