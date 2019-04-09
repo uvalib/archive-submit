@@ -1,14 +1,14 @@
 <template>
-   <div class="accordian">
-      <h4 @click="accordianClicked">
+   <div class="accordion">
+      <h4 @click="accordionClicked">
          {{title}}
          <span class="note">{{subtitle}}</span>
-         <i class="accordian-icon far fa-arrow-alt-circle-down" v-bind:style="{ transform: rotation }"></i>
+         <i class="accordion-icon fas fa-angle-down" v-bind:style="{ transform: rotation }"></i>
       </h4>
        <transition name="accordion"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div class="accordian-content"  v-show="expanded">
+         <div class="accordion-content"  v-show="expanded">
             <slot></slot>
          </div>
       </transition>
@@ -35,7 +35,7 @@ export default {
       }
    },
    methods: {
-      accordianClicked() {
+      accordionClicked() {
          this.expanded = !this.expanded
       },
       beforeEnter: function(el) {
@@ -55,7 +55,7 @@ export default {
 </script>
 
 <style scoped>
-.accordian-content {
+.accordion-content {
    overflow: hidden;
    transition: 500ms ease-out;
 }
@@ -73,7 +73,7 @@ h4:hover {
 .note {
    font-weight: 100;
 }
-h4 .accordian-icon {
+h4 .accordion-icon {
    font-size: 1.25em;
    position: absolute;
    right: 5px;

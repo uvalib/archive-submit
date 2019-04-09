@@ -1,5 +1,5 @@
 <template>
-   <AccordianContent title="Physical Records Transfer" 
+   <AccordionContent title="Physical Records Transfer" 
       subtitle="(Paper-based/Analog Records, Media Carriers)">
       <p>HELLO</p>
       <p>HELLO</p>
@@ -10,14 +10,14 @@
       <p>HELLO</p>
       <p>HELLO</p>
       <p>HELLO</p>
-   </AccordianContent>
+   </AccordionContent>
 </template>
 
 <script>
-import AccordianContent from '@/components/AccordianContent'
+import AccordionContent from '@/components/AccordionContent'
 export default {
    components: {
-      AccordianContent: AccordianContent
+      AccordionContent: AccordionContent
    },
    computed: {
    }

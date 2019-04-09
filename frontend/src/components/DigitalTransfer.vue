@@ -1,5 +1,5 @@
 <template>
-   <AccordianContent title="Digital Records Transfer">
+   <AccordionContent title="Digital Records Transfer">
       <input type="hidden" id="submitted-files" name="submitted-files" :value="uploadedFiles">
       <vue-dropzone :useCustomSlot=true id="customdropzone" 
             :options="dropzoneOptions" 
@@ -11,16 +11,16 @@
             <div class="upload subtitle">or click to select a file from your computer</div>
          </div>
       </vue-dropzone>
-   </AccordianContent>
+   </AccordionContent>
 </template>
 
 <script>
-import AccordianContent from '@/components/AccordianContent'
+import AccordionContent from '@/components/AccordionContent'
 import vue2Dropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 export default {
    components: {
-      AccordianContent: AccordianContent,
+      AccordionContent: AccordionContent,
       vueDropzone: vue2Dropzone,
    },
    data: function () {
