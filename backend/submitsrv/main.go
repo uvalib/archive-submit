@@ -35,6 +35,8 @@ func main() {
 		api.GET("/genres", svc.GetGenres)
 		api.GET("/identifier", svc.GetSubmissionIdentifier)
 		api.GET("/types", svc.GetTypes)
+		api.GET("/transfer-methods", svc.GetTransferMethods)
+		api.GET("/media-carriers", svc.GetMediaCarriers)
 		api.POST("/upload", svc.UploadFile)
 		api.DELETE("/upload/:file", svc.DeleteUploadedFile)
 		api.GET("/users/lookup", svc.UserSearch)

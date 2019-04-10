@@ -62,6 +62,7 @@ export default {
       this.$cookies.remove("archives_xfer_settings")
     }
     this.$store.dispatch('getGenres')
+    this.$store.dispatch('getRecordTypes')
     this.$store.dispatch('getUploadID')
   }
 }

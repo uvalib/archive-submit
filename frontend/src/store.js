@@ -13,7 +13,11 @@ const state = {
   isUVA: false,
   user: null,
   digitalTransfer: true,
-  physicalTransfer: false
+  physicalTransfer: false,
+  digitalRecordTypes: [],
+  physicalRecordTypes: [],
+  mediaCarriers: [],
+  transferMethods: []
 }
 
 // state getter functions. All are functions that take state as the first param 
@@ -47,15 +51,31 @@ const getters = {
   physicalTransfer: state => {
     return state.physicalTransfer
   },
+  physicalRecordTypes: state => {
+    return state.physicalRecordTypes
+  },
+  digitalRecordTypes: state => {
+    return state.digitalRecordTypes
+  },
+  mediaCarriers: state => {
+    return state.mediaCarriers
+  },
+  transferMethods: state => {
+    return state.transferMethods
+  },
 }
 
 // Synchronous updates to the state. Can be called directly in components like this:
 // this.$store.commit('mutation_name') or called from asynchronous actions
 const mutations = {
   setGenres (state, genres) {
-    if (genres) {
-      state.genres = genres
-    }
+    state.genres = genres
+  },
+  setMediaCarriers (state, carriers) {
+    state.mediaCarriers = carriers
+  },
+  setTransferMethods (state, methods) {
+    state.transferMethods = methods
   },
   setUVA (state, isUVA) {
     state.isUVA = isUVA
@@ -87,12 +107,19 @@ const mutations = {
     }
   },
   setDigitalTransfer(state, digital) {
-    console.log("SET DIGITAL TO "+digital)
     state.digitalTransfer = digital
   },
   setPhysicalTransfer(state, physical) {
-    console.log("SET PHYSICAL TO "+physical)
     state.physicalTransfer = physical
+  },
+  setRecordTypes(state, types) {
+    types.forEach(function( rt ) {
+      if (rt.digitalOnly) {
+        state.digitalRecordTypes.push(rt)
+      } else {
+        state.physicalRecordTypes.push(rt)
+      }
+    });
   },
 }
 
@@ -103,28 +130,42 @@ const mutations = {
 const actions = {
   getGenres( ctx ) {
     axios.get("/api/genres").then((response)  =>  {
-      if ( response.status === 200) {
-        ctx.commit('setGenres', response.data )
-      } else {
-        ctx.commit('setGenres', []) 
-        ctx.commit('setError', "Internal Error: "+response.data) 
-      }
+      ctx.commit('setGenres', response.data )
     }).catch(() => {
       ctx.commit('setGenres', []) 
-      ctx.commit('setError', "Internal Error: Unable to reach any services") 
+      ctx.commit('setError', "Internal Error: Unable to get genres")
+    })
+  },
+  getMediaCarriers( ctx ) {
+    axios.get("/api/media-carriers").then((response)  =>  {
+      ctx.commit('setMediaCarriers', response.data )
+    }).catch(() => {
+      ctx.commit('setMediaCarriers', []) 
+      ctx.commit('setError', "Internal Error: Unable to get genres")
+    })
+  },
+  getTransferMethods( ctx ) {
+    axios.get("/api/transfer-methods").then((response)  =>  {
+      ctx.commit('setTransferMethods', response.data )
+    }).catch(() => {
+      ctx.commit('setTransferMethods', []) 
+      ctx.commit('setError', "Internal Error: Unable to get genres")
+    })
+  },
+  getRecordTypes( ctx ) {
+    axios.get("/api/types").then((response)  =>  {
+      ctx.commit('setRecordTypes', response.data )
+    }).catch(() => {
+      ctx.commit('setRecordTypes', []) 
+      ctx.commit('setError', "Internal Error: Unable to get record types") 
     })
   },
   getUploadID( ctx ) {
     axios.get("/api/identifier").then((response)  =>  {
-      if ( response.status === 200) {
-        ctx.commit('setUploadID', response.data )
-      } else {
-        ctx.commit('setUploadID', []) 
-        ctx.commit('setError', "Internal Error: "+response.data) 
-      }
+      ctx.commit('setUploadID', response.data )
     }).catch(() => {
       ctx.commit('setUploadID', []) 
-      ctx.commit('setError', "Internal Error: Unable to reach any services") 
+      ctx.commit('setError', "Internal Error: Unable to get uploadID") 
     })
   },
   removeUploadedFile( ctx, filename ) { 

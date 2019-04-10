@@ -37,6 +37,7 @@ insert into genres(name)
 --
 -- Create table for record types
 --
+DROP TABLE IF EXISTS object_types;
 DROP TABLE IF EXISTS record_types;
 CREATE TABLE record_types (
    id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -53,6 +54,33 @@ insert into record_types(name,description,digital)
    ("Websites", "(e.g., archived, content-based)", 1), ("Text/Documents", "", 0),
    ("Photographs/Still Images", "", 0), ("Audio/Video Media", "", 0);
 
+--
+-- Create table for transfer_methods
+--
+DROP TABLE IF EXISTS transfer_methods;
+CREATE TABLE transfer_methods (
+   id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   name varchar(255) DEFAULT NULL,
+   UNIQUE KEY (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Add seed transfer_methods
+insert into transfer_methods(name)
+   values ("UVA campus mail"), ("Personal delivery"), ("Pickup by UVA Facilities");
+
+--
+-- Create table for media_carriers
+--
+DROP TABLE IF EXISTS media_carriers;
+CREATE TABLE media_carriers (
+   id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   name varchar(255) DEFAULT NULL,
+   UNIQUE KEY (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Add seed media_carriers
+insert into media_carriers(name)
+   values ('5 1/4" Disk'), ('3 1/2" Disk'), ("CD-ROM"), ("DVD-R/W"), ("USB Flash Drive"), ("Hard Drive");
 
 --
 -- Create table for users

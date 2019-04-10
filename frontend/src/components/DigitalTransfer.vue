@@ -1,16 +1,37 @@
 <template>
    <AccordionContent title="Digital Records Transfer">
-      <input type="hidden" id="submitted-files" name="submitted-files" :value="uploadedFiles">
-      <vue-dropzone :useCustomSlot=true id="customdropzone" 
-            :options="dropzoneOptions" 
-            v-on:vdropzone-sending="sendingEvent"
-            v-on:vdropzone-success="fileAddedEvent"
-            v-on:vdropzone-removed-file="fileRemovedEvent">
-         <div class="dropzone-custom">
-            <div class="upload title">Drag and drop to upload content</div>
-            <div class="upload subtitle">or click to select a file from your computer</div>
+      <div class="data-form">
+         <div class="pure-u-1-2">
+            <label for="dig-date-range">Date Range of Files</label>
+            <input id="dig-date-range" class="pure-u-23-24" type="text">
          </div>
-      </vue-dropzone>
+         <div class="pure-u-1-2">
+            <label for="dig-size">Extent of records <span class="note">(in gigabytes)</span></label>
+            <input id="dig-size" class="pure-u-23-24" type="text">
+         </div>
+         <div class="pure-u-1-1 gap">
+            <label for="dig-types">Record Types <span class="note">(check all that apply)</span></label>
+            <div class="choices">
+               <span v-for="rt in digitalRecordTypes" :key="rt.id">
+                  <label class="pure-checkbox inline">
+                     <input type="checkbox" name="dig-record-type" :value="rt.id">
+                     {{ rt.name }}<span class="note">{{rt.description}}</span>
+                  </label>
+               </span>
+            </div>
+         </div>
+         <input type="hidden" id="submitted-files" name="submitted-files" :value="uploadedFiles">
+         <vue-dropzone :useCustomSlot=true id="customdropzone" 
+               :options="dropzoneOptions" 
+               v-on:vdropzone-sending="sendingEvent"
+               v-on:vdropzone-success="fileAddedEvent"
+               v-on:vdropzone-removed-file="fileRemovedEvent">
+            <div class="dropzone-custom">
+               <div class="upload title">Drag and drop to upload content</div>
+               <div class="upload subtitle">or click to select a file from your computer</div>
+            </div>
+         </vue-dropzone>
+      </div>
    </AccordionContent>
 </template>
 
@@ -18,6 +39,8 @@
 import AccordionContent from '@/components/AccordionContent'
 import vue2Dropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
+import { mapGetters } from "vuex"
+
 export default {
    components: {
       AccordionContent: AccordionContent,
@@ -36,7 +59,10 @@ export default {
       }
    },
    computed: {
-      uploadedFiles: function() {
+      digitalRecordTypes() {
+         return this.$store.getters.digitalRecordTypes
+      },
+      uploadedFiles() {
          return this.$store.getters.uploadedFiles
       }
    },
@@ -84,8 +110,22 @@ export default {
 </script>
 
 <style scoped>
+div.gap {
+   margin: 10px 0;
+}
 div.dropzone-custom {
   color: #666;
+}
+.inline {
+   display: inline-block;
+   margin-left:15px;
+}
+.inline .note {
+   margin-left: 5px;
+}
+.note {
+   color: #999;
+   font-size: 0.85em;
 }
 div.upload.title {
   font-weight: bold;
