@@ -6,6 +6,7 @@ import Submit from './views/Submit.vue'
 import Admin from './views/Admin.vue'
 import Forbidden from './views/Forbidden.vue'
 import Verify from './views/Verify.vue'
+import store from './store';
 
 Vue.use(Router)
 
@@ -26,7 +27,19 @@ export default new Router({
     {
       path: '/submit',
       name: 'submit',
-      component: Submit
+      component: Submit,
+      beforeEnter: (to, from, next) => {
+        // must have a user in the store or in the cookie to access the submit form
+        // Note: can also call Vue.cookies.keys() to get an array of all cookie names
+        // this could be used to look fo a _shibsession* cookie in the app domain to
+        // ensure authorization
+        let authUser = Vue.cookies.get("archives_xfer_user")
+        if (store.state.user == null && authUser == null ) {
+          next("/")
+        } else {
+          next()
+        }
+      }
     },
     {
       path: '/verify/:token',

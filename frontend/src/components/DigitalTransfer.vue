@@ -46,7 +46,6 @@
 import AccordionContent from '@/components/AccordionContent'
 import vue2Dropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
-import { mapGetters } from "vuex"
 
 export default {
    components: {
