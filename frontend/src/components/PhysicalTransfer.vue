@@ -58,7 +58,7 @@
                <textarea class="pure-u-1-1" id="tech-description"></textarea>
             </div>
             
-            <div class="pure-u-1-2">
+            <div class="pure-u-1-1">
                <label>
                   Media carriers
                   <span class="note">(check all that apply)</span>
