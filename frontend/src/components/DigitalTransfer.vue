@@ -1,6 +1,13 @@
 <template>
    <AccordionContent title="Digital Records Transfer">
       <div class="data-form">
+         <div class="pure-u-1-1 gap">
+            <label>
+               Describe Technical Information
+               <span class="note">(e.g., software that created files, OS, hardware, naming conventions, and original location).</span>
+            </label>
+            <textarea class="pure-u-1-1" id="dig-tech-description"></textarea>
+         </div>
          <div class="pure-u-1-2">
             <label for="dig-date-range">Date Range of Files</label>
             <input id="dig-date-range" class="pure-u-23-24" type="text">
