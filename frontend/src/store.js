@@ -1,31 +1,52 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import { getField, updateField } from 'vuex-map-fields';
 
 Vue.use(Vuex)
 
 // root state object. Holds all of the state for the system
 const state = {
   genres: [],
-  uploadID: null,
   error: null,
-  uploadedFiles: [],
   isUVA: false,
-  user: null,
   digitalTransfer: true,
   physicalTransfer: false,
   digitalRecordTypes: [],
   physicalRecordTypes: [],
   mediaCarriers: [],
-  transferMethods: []
+  transferMethods: [],
+  user: {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    title: '',
+    affiliation: ''
+  },
+  general: {
+    summary: '',
+    activities: '',
+    creator: '',
+    selectedGenres: [],
+    accessionType: 'new'
+  },
+  digital: {
+    uploadID: null,
+    description: '',
+    dateRange: '',
+    selectedTypes: [],
+    uploadedFiles: []
+  }
 }
 
 // state getter functions. All are functions that take state as the first param 
 // and the getters themselves as the second param. Getter params are passed 
 // as a function. Access as a property like: this.$store.getters.NAME
 const getters = {
+  getField,
   uploadID: state => {
-    return state.uploadID
+    return state.digital.uploadID
   },
   genres: state => {
     return state.genres
@@ -35,9 +56,6 @@ const getters = {
   },
   hasError: state => {
     return state.error != null && state.error != ""
-  },
-  uploadedFiles: state => {
-    return state.uploadedFiles
   },
   isUVA: state => {
     return state.isUVA
@@ -68,6 +86,7 @@ const getters = {
 // Synchronous updates to the state. Can be called directly in components like this:
 // this.$store.commit('mutation_name') or called from asynchronous actions
 const mutations = {
+  updateField,
   setGenres (state, genres) {
     state.genres = genres
   },
@@ -95,15 +114,15 @@ const mutations = {
     state.error = error
   },
   setUploadID (state, uploadID) {
-    state.uploadID = uploadID
+    state.digital.uploadID = uploadID
   },
   addUploadedFile (state, filename) {
-    state.uploadedFiles.push(filename)
+    state.digital.uploadedFiles.push(filename)
   },
   removeUploadedFile (state, filename) {
-    let index = state.uploadedFiles.indexOf(filename)
+    let index = state.digital.uploadedFiles.indexOf(filename)
     if (index !== -1) {
-      state.uploadedFiles.splice(index, 1)
+      state.digital.uploadedFiles.splice(index, 1)
     }
   },
   setDigitalTransfer(state, digital) {
@@ -164,7 +183,7 @@ const actions = {
     axios.get("/api/identifier").then((response)  =>  {
       ctx.commit('setUploadID', response.data )
     }).catch(() => {
-      ctx.commit('setUploadID', []) 
+      ctx.commit('setUploadID', "") 
       ctx.commit('setError', "Internal Error: Unable to get uploadID") 
     })
   },

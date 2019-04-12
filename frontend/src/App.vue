@@ -65,5 +65,25 @@
     position: relative;
     font-size: 24px;
   }
+  #customdropzone  {
+  padding: 5px;
+  height: 180px;
+}
+  #customdropzone .dz-preview {
+   display: inline-block;
+   background: transparent;
+   margin: 5px;
+}
+#customdropzone .dz-preview .dz-details {
+   background-color: rgba(64, 64, 64, 0.5);
+   transition: none;
+}
+#customdropzone .dz-preview .dz-image {
+   width: 150px;
+   height: 150px;
+}
+#app a.dz-remove {
+   color: white;
+}
 </style>
 

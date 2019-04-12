@@ -65,6 +65,7 @@ h4 {
    cursor: pointer;
    border-bottom: 1px solid #666;
    margin: 10px 0;
+   font-size: 1.15em;
 }
 h4:hover {
    color: #444;

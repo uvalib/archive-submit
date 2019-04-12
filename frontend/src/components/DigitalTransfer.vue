@@ -6,28 +6,23 @@
                Describe Technical Information
                <span class="note">(e.g., software that created files, OS, hardware, naming conventions, and original location).</span>
             </label>
-            <textarea class="pure-u-1-1" id="dig-tech-description"></textarea>
+            <textarea class="pure-u-1-1" id="dig-tech-description" v-model="description"></textarea>
          </div>
-         <div class="pure-u-1-2">
+         <div class="pure-u-1-1">
             <label for="dig-date-range">Date Range of Files</label>
-            <input id="dig-date-range" class="pure-u-23-24" type="text">
-         </div>
-         <div class="pure-u-1-2">
-            <label for="dig-size">Extent of records <span class="note">(in gigabytes)</span></label>
-            <input id="dig-size" class="pure-u-23-24" type="text">
+            <input id="dig-date-range" class="pure-u-1-1" type="text" v-model="dateRange">
          </div>
          <div class="pure-u-1-1 gap">
             <label for="dig-types">Record Types <span class="note">(check all that apply)</span></label>
             <div class="choices">
                <span v-for="rt in digitalRecordTypes" :key="rt.id">
                   <label class="pure-checkbox inline">
-                     <input type="checkbox" name="dig-record-type" :value="rt.id">
+                     <input type="checkbox" name="dig-record-type" :value="rt.id" v-model="selectedTypes">
                      {{ rt.name }}<span class="note">{{rt.description}}</span>
                   </label>
                </span>
             </div>
          </div>
-         <input type="hidden" id="submitted-files" name="submitted-files" :value="uploadedFiles">
          <vue-dropzone :useCustomSlot=true id="customdropzone" 
                :options="dropzoneOptions" 
                v-on:vdropzone-sending="sendingEvent"
@@ -46,6 +41,7 @@
 import AccordionContent from '@/components/AccordionContent'
 import vue2Dropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
    components: {
@@ -54,13 +50,15 @@ export default {
    },
    data: function () {
       return {
+         submitted: false,
          dropzoneOptions: {
             url: '/api/upload',
-            createImageThumbnails: false,
+            createImageThumbnails: true,
             maxFilesize: null,
             chunking: true,
             chunkSize: 10000000, // bytes = 10Mb,
-            previewTemplate: this.template()
+             addRemoveLinks: true 
+            // previewTemplate: this.template()
          }
       }
    },
@@ -70,16 +68,22 @@ export default {
       },
       uploadedFiles() {
          return this.$store.getters.uploadedFiles
-      }
+      },
+      ...mapFields([
+         'digital.summary',
+         'digital.description',
+         'digital.dateRange',
+         'digital.selectedTypes',
+      ])
    },
    methods: {
       fileAddedEvent (file) {
-         // just adds filename to store list 
          this.$store.commit("addUploadedFile",file.name)
       },
       fileRemovedEvent (file) {
-         // makes an ajax call to the service to remove the file
-         this.$store.dispatch("removeUploadedFile",file.name)
+         if (this.submitted === false ) {
+            this.$store.dispatch("removeUploadedFile",file.name)
+         }
       },
       sendingEvent (file, xhr, formData) {
          formData.append('identifier', this.$store.getters.uploadID);

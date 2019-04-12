@@ -6,7 +6,7 @@ import Submit from './views/Submit.vue'
 import Admin from './views/Admin.vue'
 import Forbidden from './views/Forbidden.vue'
 import Verify from './views/Verify.vue'
-import store from './store';
+import store from './store'
 
 Vue.use(Router)
 

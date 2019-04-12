@@ -20,6 +20,8 @@
         </template>
       </fieldset>
     </form>
+    <div class="error">{{error}}</div>
+    <span @click="submitClicked" class="submit pure-button pure-button-primary">Submit</span>
   </div>
 </template>
 
@@ -64,6 +66,11 @@ export default {
     this.$store.dispatch('getGenres')
     this.$store.dispatch('getRecordTypes')
     this.$store.dispatch('getUploadID')
+  },
+  methods: {
+    submitClicked() {
+      
+    }
   }
 }
 </script>
