@@ -13,6 +13,61 @@ import (
 	"github.com/rs/xid"
 )
 
+// Accession wraps the general, physical and digital info for a records transfer
+type Accession struct {
+	Summary          string            `json:"summary"`
+	Activities       string            `json:"activities"`
+	Creator          string            `json:"creator"`
+	GenreIDs         []string          `json:"selectedGenres"`
+	Type             string            `json:"accessionType"`
+	DigitalTransfer  bool              `json:"digitalTransfer"`
+	Digital          DigitalAccession  `json:"digital"`
+	PhysicalTransfer bool              `json:"physicalTransfer"`
+	Physical         PhysicalAccession `json:"physical"`
+}
+
+// DigitalAccession contains data supporting digital file accessions
+type DigitalAccession struct {
+	UploadID      string   `json:"uploadID"`
+	Description   string   `json:"description"`
+	DateRange     string   `json:"dateRange"`
+	RecordTypeIDs []string `json:"selectedTypes"`
+	Files         []string `json:"uploadedFiles"`
+	TotalSize     int      `json:"totalSizeBytes"`
+}
+
+// PhysicalAccession contains data supporting digital file accessions
+type PhysicalAccession struct {
+	DateRange        string   `json:"dateRange"`
+	BoxInfo          string   `json:"boxInfo"`
+	RecordTypeIDs    []string `json:"selectedTypes"`
+	TransferMethodID int      `json:"transferMethod"`
+	HasDigital       bool     `json:"hasDigital"`
+	TechInfo         string   `json:"techInfo"`
+	MediaCarrierIDs  []string `json:"mediaCarriers"`
+	MediaCount       string   `json:"mediaCount"`
+	HasSoftware      bool     `json:"hasSoftware"`
+}
+
+// Submission wraps all of the data necessary for a records transfer
+type Submission struct {
+	User      User      `json:"user"`
+	Accession Accession `json:"accession"`
+}
+
+// Submit accepts a transfer submission, creates a DB record and kicks off submission
+// processing. When complete, an email is sent to the submitter
+func (svc *ServiceContext) Submit(c *gin.Context) {
+	var submission Submission
+	err := c.BindJSON(&submission)
+	if err != nil {
+		log.Printf("ERROR: Unable to parse request: %s", err.Error())
+		c.String(http.StatusBadRequest, err.Error())
+	}
+	log.Printf("GOT %+v", submission)
+	c.String(http.StatusNotImplemented, "WOOF")
+}
+
 // GetSubmissionIdentifier will generate an unique token to identify a new submission
 // It will be used as a storage subdir for submission files as they are uploaded
 func (svc *ServiceContext) GetSubmissionIdentifier(c *gin.Context) {

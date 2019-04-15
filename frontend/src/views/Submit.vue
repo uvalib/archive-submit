@@ -31,6 +31,7 @@ import GeneralInfo from '@/components/GeneralInfo'
 import PhysicalTransfer from '@/components/PhysicalTransfer'
 import DigitalTransfer from '@/components/DigitalTransfer'
 import { mapGetters } from "vuex"
+import axios from 'axios'
 
 export default {
   name: 'submit',
@@ -69,7 +70,61 @@ export default {
   },
   methods: {
     submitClicked() {
-      
+      let state = this.$store.state
+      let json = {
+        user: {
+          firstName: state.user.firstName,
+          lastName: state.user.lastName,
+          email: state.user.email,
+          phone: state.user.phone,
+          title: state.user.title,
+          affiliation: state.user.affiliation,
+        },
+        accession: {
+          summary: state.general.summary,
+          activities: state.general.activities,
+          creator: state.general.creator,
+          selectedGenres: state.general.selectedGenres,
+          accessionType: state.general.accessionType,
+          digitalTransfer: state.digitalTransfer,
+          physicalTransfer: state.physicalTransfer,
+        }
+      }
+      if (state.digitalTransfer) {
+        json.accession.digital = {
+          uploadID: state.digital.uploadID,
+          description: state.digital.description,
+          dateRange: state.digital.dateRange,
+          selectedTypes: state.digital.selectedTypes,
+          uploadedFiles: state.digital.uploadedFiles,
+          totalSizeBytes: state.digital.totalSizeBytes,
+        }
+      }
+      if (state.physicalTransfer) { 
+        json.accession.physical = {
+          dateRange: state.digital.dateRange,
+          boxInfo: state.digital.boxInfo,
+          selectedTypes: state.digital.selectedTypes,
+          transferMethod: state.digital.transferMethod,
+          hasDigital: state.digital.hasDigital,
+          techInfo: state.digital.techInfo,
+          mediaCarriers: state.digital.mediaCarriers,
+          mediaCount: state.digital.mediaCount,
+          hasSoftware: state.digital.hasSoftware,
+        }
+        if ( !state.digital.hasDigital) {
+          delete json.accession.physical.techInfo 
+          delete json.accession.physical.mediaCarriers 
+          delete json.accession.physical.mediaCount 
+          delete json.accession.physical.hasSoftware 
+        }
+      }
+      axios.post("/api/submit", json).then((response)  =>  {
+        this.submitted = true
+        this.$router.push("thanks")
+      }).catch((error) => {
+        this.$store.commit("setError",error.response.data) 
+      })
     }
   }
 }

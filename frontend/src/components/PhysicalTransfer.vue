@@ -41,11 +41,11 @@
          <div class="pure-u-1-1">
             <label>Does this transfer include items on digital media carriers?</label>
             <label class="pure-radio inline">
-               <input v-model="hasDigital" type="radio" name="has-digital" value="yes" checked>
+               <input v-model="hasDigital" type="radio" name="has-digital" value="1" checked>
                Yes
             </label>
             <label class="pure-radio inline">
-               <input v-model="hasDigital" type="radio" name="has-digital" value="no">
+               <input v-model="hasDigital" type="radio" name="has-digital" value="0">
                No
             </label>
          </div>
@@ -82,11 +82,11 @@
             <div class="pure-u-1-1">
                <label>Do the digital records include any software?</label>
                <label class="pure-radio inline">
-                  <input type="radio" name="has-software" value="yes" v-model="hasSoftware">
+                  <input type="radio" name="has-software" value="1" v-model="hasSoftware">
                   Yes
                </label>
                <label class="pure-radio inline">
-                  <input type="radio" name="has-software" value="no" checked v-model="hasSoftware">
+                  <input type="radio" name="has-software" value="0" checked v-model="hasSoftware">
                   No
                </label>
             </div>
@@ -105,13 +105,13 @@ export default {
    },
    computed: {
       physicalRecordTypes() {
-         return this.$store.getters.physicalRecordTypes;
+         return this.$store.getters.physicalRecordTypes
       },
       transferMethods() {
-         return this.$store.getters.transferMethods;
+         return this.$store.getters.transferMethods
       },
       mediaCarriers() {
-         return this.$store.getters.mediaCarriers;
+         return this.$store.getters.mediaCarriers
       },
       ...mapFields([
          'physical.dateRange',
@@ -126,8 +126,8 @@ export default {
       ])
    },
    created: function() {
-      this.$store.dispatch("getTransferMethods");
-      this.$store.dispatch("getMediaCarriers");
+      this.$store.dispatch("getTransferMethods")
+      this.$store.dispatch("getMediaCarriers")
    }
 };
 </script>
