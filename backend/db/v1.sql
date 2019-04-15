@@ -104,7 +104,7 @@ CREATE TABLE users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Create table for generl accession info
+-- Create table for general accession info
 --
 DROP TABLE IF EXISTS accessions;
 CREATE TABLE accessions (
@@ -113,7 +113,87 @@ CREATE TABLE accessions (
    description text DEFAULT NULL,
    activities text DEFAULT NULL,
    creator text DEFAULT NULL,
-   FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+   accession_type varchar(25), 
+   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Create table for accession record types
+--
+DROP TABLE IF EXISTS accession_record_types;
+CREATE TABLE accession_record_types (
+   id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   accession_id int(11) NOT NULL,
+   record_type_id int(11) NOT NULL,
+   FOREIGN KEY (accession_id) REFERENCES accessions(id) ON DELETE CASCADE,
+   FOREIGN KEY (record_type_id) REFERENCES record_types(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Create table for accession genres
+--
+DROP TABLE IF EXISTS accession_genres;
+CREATE TABLE accession_genres (
+   id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   accession_id int(11) NOT NULL,
+   genre_id int(11) NOT NULL,
+   FOREIGN KEY (accession_id) REFERENCES accessions(id) ON DELETE CASCADE,
+   FOREIGN KEY (genre_id) REFERENCES genres(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Create table for digital accessions
+--
+DROP TABLE IF EXISTS digital_accessions;
+CREATE TABLE digital_accessions (
+   id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   accession_id int(11) NOT NULL,
+   upload_id varchar(25) not null,
+   upload_size int(11),
+   date_range varchar(255),
+   description text,
+   FOREIGN KEY (accession_id) REFERENCES accessions(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Create table for physical accessions
+--
+DROP TABLE IF EXISTS physical_accessions;
+CREATE TABLE physical_accessions (
+   id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   accession_id int(11) NOT NULL,
+   date_range varchar(255),
+   box_info varchar(255),
+   transfer_method_id int(11) NOT NULL,
+   has_digital boolean not null default false,
+   has_software boolean not null default false,
+   tech_description text,
+   media_counts varchar(255),
+   FOREIGN KEY (transfer_method_id) REFERENCES transfer_methods(id) ON DELETE CASCADE,
+   FOREIGN KEY (accession_id) REFERENCES accessions(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Create table for physicl accession media carriers
+--
+DROP TABLE IF EXISTS physical_media_carriers;
+CREATE TABLE physical_media_carriers (
+   id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   physical_accession_id int(11) NOT NULL,
+   media_carrier_id int(11) NOT NULL,
+   FOREIGN KEY (physical_accession_id) REFERENCES physical_accessions(id) ON DELETE CASCADE,
+   FOREIGN KEY (media_carrier_id) REFERENCES media_carriers(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Create table for digital files
+--
+DROP TABLE IF EXISTS digital_files;
+CREATE TABLE digital_files (
+   id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   digital_accession_id int(11) NOT NULL,
+   filename varchar(255) NOT NULL,
+   FOREIGN KEY (digital_accession_id) REFERENCES digital_accessions(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -128,5 +208,5 @@ CREATE TABLE inventory_items (
    box_title varchar(255),
    description text,
    dates varchar(255),
-   FOREIGN KEY (accession_id) REFERENCES accession(id) ON DELETE CASCADE
+   FOREIGN KEY (accession_id) REFERENCES accessions(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
