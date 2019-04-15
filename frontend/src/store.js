@@ -36,7 +36,19 @@ const state = {
     description: '',
     dateRange: '',
     selectedTypes: [],
-    uploadedFiles: []
+    uploadedFiles: [],
+    totalSizeBytes: 0
+  },
+  physical: {
+    dateRange: '',
+    boxInfo: '',
+    selectedTypes: [],
+    transferMethod: '',
+    hasDigital: 'yes',
+    techInfo: '',
+    mediaCarriers: [],
+    mediaCount: '',
+    hasSoftware: 'no'
   }
 }
 
@@ -81,6 +93,14 @@ const getters = {
   transferMethods: state => {
     return state.transferMethods
   },
+  digitalUploadSize: state => {
+    let mb = state.digital.totalSizeBytes/(1000.0*1000.0)
+    if (mb > 1000.0) {
+      return mb/1000.0.toFixed(2)+"GB"
+    } else {
+      return mb.toFixed(2)+"MB"
+    }
+  }, 
 }
 
 // Synchronous updates to the state. Can be called directly in components like this:
@@ -116,13 +136,15 @@ const mutations = {
   setUploadID (state, uploadID) {
     state.digital.uploadID = uploadID
   },
-  addUploadedFile (state, filename) {
-    state.digital.uploadedFiles.push(filename)
+  addUploadedFile (state, file) {
+    state.digital.uploadedFiles.push(file.name)
+    state.digital.totalSizeBytes += file.size
   },
-  removeUploadedFile (state, filename) {
-    let index = state.digital.uploadedFiles.indexOf(filename)
+  removeUploadedFile (state, file) {
+    let index = state.digital.uploadedFiles.indexOf(file.name)
     if (index !== -1) {
       state.digital.uploadedFiles.splice(index, 1)
+      state.digital.totalSizeBytes -= file.size
     }
   },
   setDigitalTransfer(state, digital) {
