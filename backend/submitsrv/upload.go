@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -64,7 +65,25 @@ func (svc *ServiceContext) Submit(c *gin.Context) {
 		log.Printf("ERROR: Unable to parse request: %s", err.Error())
 		c.String(http.StatusBadRequest, err.Error())
 	}
-	log.Printf("GOT %+v", submission)
+	log.Printf("Received: %+v", submission)
+
+	log.Printf("Processing Submitter info...")
+	existingUser := User{}
+	err = existingUser.FindByEmail(svc.DB, submission.User.Email)
+	if err != nil {
+		log.Printf("ERROR: Submitter %s not found in DB - %s", submission.User.Email, err.Error())
+		c.String(http.StatusBadRequest, "User %s does not exist", submission.User.Email)
+		return
+	}
+	submission.User.ID = existingUser.ID
+	submission.User.UpdatedAt = time.Now()
+	log.Printf("Found user %+v => updating fields to %+v", existingUser, submission.User)
+	err = svc.DB.Model(&submission.User).Exclude("Verified", "VerifyToken", "Admin", "CreatedAt").Update()
+	if err != nil {
+		log.Printf("WARN: Unable to ubdate %s - %s", submission.User.Email, err.Error())
+	}
+
+	log.Printf("Process common accession information...")
 	c.String(http.StatusNotImplemented, "WOOF")
 }
 

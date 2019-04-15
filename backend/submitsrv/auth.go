@@ -41,7 +41,7 @@ func (svc *ServiceContext) Authenticate(c *gin.Context) {
 
 	log.Printf("Authentication successful for %s", computingID)
 	json, _ := json.Marshal(user)
-	log.Printf(string(json))
+	log.Printf("Authenticated user: %s", string(json))
 	c.SetCookie("archives_xfer_user", string(json), 3600, "/", "", false, false)
 	c.Redirect(http.StatusFound, "/submit")
 }

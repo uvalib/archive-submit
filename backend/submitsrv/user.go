@@ -18,17 +18,22 @@ import (
 // User maps the users table into a structure
 type User struct {
 	ID          string    `json:"id"`
-	FirstName   string    `json:"firstName" db:"first_name" form:"fname"`
-	LastName    string    `json:"lastName" db:"last_name" form:"lname"`
-	Title       string    `json:"title" form:"title"`
-	Affiliation string    `json:"affiliation"  db:"university_affiliation" form:"affiliation"`
-	Email       string    `json:"email" form:"email"`
-	Phone       string    `json:"phone" form:"phone"`
+	FirstName   string    `json:"firstName" db:"first_name" form:"fname" binding:"required"`
+	LastName    string    `json:"lastName" db:"last_name" form:"lname" binding:"required"`
+	Title       string    `json:"title" form:"title" binding:"required"`
+	Affiliation string    `json:"affiliation"  db:"university_affiliation" form:"affiliation" binding:"required"`
+	Email       string    `json:"email" form:"email" binding:"required"`
+	Phone       string    `json:"phone" form:"phone" binding:"required"`
 	Verified    bool      `json:"verified"`
 	VerifyToken string    `json:"token"  db:"verify_token" `
 	Admin       bool      `json:"-"`
 	CreatedAt   time.Time `db:"created_at" json:"-"`
 	UpdatedAt   time.Time `db:"updated_at" json:"-"`
+}
+
+// TableName defines the expected DB table name that holds data for users
+func (user *User) TableName() string {
+	return "users"
 }
 
 // IsValid makes sure all fields are set and look right
@@ -82,11 +87,6 @@ func (user *User) SendVerifyEmail(baseURL string, smtpCfg SMTPConfig) {
 			return
 		}
 	}
-}
-
-// TableName defines the expected DB table name that holds data for users
-func (user *User) TableName() string {
-	return "users"
 }
 
 // FindByEmail finds a user by email
