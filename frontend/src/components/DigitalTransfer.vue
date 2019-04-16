@@ -53,7 +53,7 @@ export default {
    },
    data: function () {
       return {
-         submitted: false,
+         destroyStarted: false,
          dropzoneOptions: {
             url: '/api/upload',
             createImageThumbnails: true,
@@ -63,6 +63,9 @@ export default {
              addRemoveLinks: true 
          }
       }
+   },
+   beforeDestroy() {
+      this.destroyStarted = true
    },
    computed: {
       digitalRecordTypes() {
@@ -86,7 +89,7 @@ export default {
          this.$store.commit("addUploadedFile",file)
       },
       fileRemovedEvent (file) {
-         if (this.submitted === false ) {
+         if (this.destroyStarted === false ) {
             this.$store.dispatch("removeUploadedFile",file)
          }
       },

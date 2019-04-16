@@ -42,7 +42,7 @@ export default {
     PhysicalTransfer: PhysicalTransfer
   },
   computed: {
-      ...mapGetters(["hasError", "error","digitalTransfer", "physicalTransfer"]),
+      ...mapGetters(["hasError", "error","digitalTransfer", "physicalTransfer", "user"]),
       showDigital() {
         return this.digitalTransfer === true
       },
@@ -63,6 +63,10 @@ export default {
       this.$store.commit("setUser",authUser)
       this.$cookies.remove("archives_xfer_user")
       this.$cookies.remove("archives_xfer_settings")
+    } else {
+      if (this.user.id === 0 ) {
+        this.$router.push("/")
+      }
     }
     this.$store.dispatch('getGenres')
     this.$store.dispatch('getRecordTypes')
@@ -70,53 +74,35 @@ export default {
   },
   methods: {
     submitClicked() {
+      // clean up data from store (put into heirarchy / remove some fields) and send to server as an accession
       let state = this.$store.state
       let json = {
-        user: {
-          firstName: state.user.firstName,
-          lastName: state.user.lastName,
-          email: state.user.email,
-          phone: state.user.phone,
-          title: state.user.title,
-          affiliation: state.user.affiliation,
-        },
-        accession: {
-          summary: state.general.summary,
-          activities: state.general.activities,
-          creator: state.general.creator,
-          selectedGenres: state.general.selectedGenres,
-          accessionType: state.general.accessionType,
-          digitalTransfer: state.digitalTransfer,
-          physicalTransfer: state.physicalTransfer,
-        }
+        user: state.user,
+        summary: state.general.summary,
+        activities: state.general.activities,
+        creator: state.general.creator,
+        selectedGenres: state.general.selectedGenres,
+        accessionType: state.general.accessionType,
+        digitalTransfer: state.digitalTransfer,
+        physicalTransfer: state.physicalTransfer,
       }
       if (state.digitalTransfer) {
-        json.accession.digital = {
-          uploadID: state.digital.uploadID,
-          description: state.digital.description,
-          dateRange: state.digital.dateRange,
-          selectedTypes: state.digital.selectedTypes,
-          uploadedFiles: state.digital.uploadedFiles,
-          totalSizeBytes: state.digital.totalSizeBytes,
-        }
+        json.digital = state.digital
       }
       if (state.physicalTransfer) { 
-        json.accession.physical = {
-          dateRange: state.digital.dateRange,
-          boxInfo: state.digital.boxInfo,
-          selectedTypes: state.digital.selectedTypes,
-          transferMethod: state.digital.transferMethod,
-          hasDigital: state.digital.hasDigital,
-          techInfo: state.digital.techInfo,
-          mediaCarriers: state.digital.mediaCarriers,
-          mediaCount: state.digital.mediaCount,
-          hasSoftware: state.digital.hasSoftware,
-        }
-        if ( !state.digital.hasDigital) {
-          delete json.accession.physical.techInfo 
-          delete json.accession.physical.mediaCarriers 
-          delete json.accession.physical.mediaCount 
-          delete json.accession.physical.hasSoftware 
+        // NOTE: Clone the physical data here because we will convert some 
+        // of it to int or bool to help back end processing. Don't want to mess 
+        // up the store data
+        json.physical = {}
+        Object.assign(json.physical, state.physical)
+        json.physical.transferMethod = parseInt(json.physical.transferMethod, 10)
+        json.physical.hasDigital = (json.physical.hasDigital === "1")
+        json.physical.hasSoftware = (json.physical.hasSoftware === "1")
+        if ( !state.physical.hasDigital) {
+          delete json.physical.techInfo 
+          delete json.physical.mediaCarriers 
+          delete json.physical.mediaCount 
+          delete json.physical.hasSoftware 
         }
       }
       axios.post("/api/submit", json).then((response)  =>  {
@@ -131,6 +117,11 @@ export default {
 </script>
 
 <style scoped>
+div.error {
+  font-style: italic;
+  color: firebrick;
+  padding: 5px 00 15px;
+}
 a {
    color: cornflowerblue;
    font-weight: 500;

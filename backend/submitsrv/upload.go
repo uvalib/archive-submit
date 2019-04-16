@@ -7,83 +7,196 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	dbx "github.com/go-ozzo/ozzo-dbx"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/rs/xid"
 )
 
-// Accession wraps the general, physical and digital info for a records transfer
-type Accession struct {
-	Summary          string            `json:"summary"`
-	Activities       string            `json:"activities"`
-	Creator          string            `json:"creator"`
-	GenreIDs         []string          `json:"selectedGenres"`
-	Type             string            `json:"accessionType"`
-	DigitalTransfer  bool              `json:"digitalTransfer"`
-	Digital          DigitalAccession  `json:"digital"`
-	PhysicalTransfer bool              `json:"physicalTransfer"`
-	Physical         PhysicalAccession `json:"physical"`
-}
-
 // DigitalAccession contains data supporting digital file accessions
 type DigitalAccession struct {
-	UploadID      string   `json:"uploadID"`
-	Description   string   `json:"description"`
-	DateRange     string   `json:"dateRange"`
-	RecordTypeIDs []string `json:"selectedTypes"`
-	Files         []string `json:"uploadedFiles"`
-	TotalSize     int      `json:"totalSizeBytes"`
+	ID            int      `json:"-"`
+	AccessionID   int      `json:"-" db:"accession_id"`
+	UploadID      string   `json:"uploadID" db:"upload_id"`
+	Description   string   `json:"description" db:"description"`
+	DateRange     string   `json:"dateRange" db:"date_range"`
+	RecordTypeIDs []string `json:"selectedTypes" db:"-"`
+	Files         []string `json:"uploadedFiles" db:"-"`
+	TotalSize     int      `json:"totalSizeBytes" db:"upload_size"`
+}
+
+// TableName defines the expected DB table name that holds data for digital accessions
+func (da *DigitalAccession) TableName() string {
+	return "digital_accessions"
 }
 
 // PhysicalAccession contains data supporting digital file accessions
 type PhysicalAccession struct {
-	DateRange        string   `json:"dateRange"`
-	BoxInfo          string   `json:"boxInfo"`
-	RecordTypeIDs    []string `json:"selectedTypes"`
-	TransferMethodID int      `json:"transferMethod"`
-	HasDigital       bool     `json:"hasDigital"`
-	TechInfo         string   `json:"techInfo"`
-	MediaCarrierIDs  []string `json:"mediaCarriers"`
-	MediaCount       string   `json:"mediaCount"`
-	HasSoftware      bool     `json:"hasSoftware"`
+	ID               int      `json:"-"`
+	AccessionID      int      `json:"-" db:"accession_id"`
+	DateRange        string   `json:"dateRange" db:"date_range"`
+	BoxInfo          string   `json:"boxInfo" db:"box_info"`
+	RecordTypeIDs    []string `json:"selectedTypes" db:"-"`
+	TransferMethodID int      `json:"transferMethod" db:"transfer_method_id"`
+	HasDigital       bool     `json:"hasDigital" db:"has_digital"`
+	TechInfo         string   `json:"techInfo" db:"tech_description"`
+	MediaCarrierIDs  []string `json:"mediaCarriers" db:"-"`
+	MediaCount       string   `json:"mediaCount" db:"media_counts"`
+	HasSoftware      bool     `json:"hasSoftware" db:"has_software"`
 }
 
-// Submission wraps all of the data necessary for a records transfer
-type Submission struct {
-	User      User      `json:"user"`
-	Accession Accession `json:"accession"`
+// TableName defines the expected DB table name that holds data for physical accessions
+func (pa *PhysicalAccession) TableName() string {
+	return "physical_accessions"
+}
+
+// Accession wraps the general, physical and digital info for a records transfer
+// NOTE: the nested structures cause problems in the insert / update calls and must
+// be handled separately. The extra *ID and db:"-" accomplishes this. Lists are also
+// a problem and must be blocked and handled separately
+type Accession struct {
+	ID               int               `json:"id" db:"id"`
+	UserID           int               `json:"-" db:"user_id"`
+	User             User              `json:"user" db:"-"`
+	Summary          string            `json:"summary" binding:"required" db:"description"`
+	Activities       string            `json:"activities" db:"activities"`
+	Creator          string            `json:"creator" db:"creator"`
+	GenreIDs         []string          `json:"selectedGenres" db:"-"`
+	Type             string            `json:"accessionType" db:"accession_type"`
+	DigitalTransfer  bool              `json:"digitalTransfer" db:"-"`
+	Digital          DigitalAccession  `json:"digital" db:"-"`
+	PhysicalTransfer bool              `json:"physicalTransfer" db:"-"`
+	Physical         PhysicalAccession `json:"physical" db:"-"`
+}
+
+// TableName defines the expected DB table name that holds data for users
+func (a *Accession) TableName() string {
+	return "accessions"
+}
+
+// WriteGenres writes genre info for an accession to the DB
+func (a *Accession) WriteGenres(db *dbx.DB) {
+	log.Printf("Commmit genres")
+	for _, genreIDStr := range a.GenreIDs {
+		genreID, _ := strconv.Atoi(genreIDStr)
+		_, err := db.Insert("accession_genres", dbx.Params{
+			"accession_id": a.ID,
+			"genre_id":     genreID,
+		}).Execute()
+		if err != nil {
+			log.Printf("WARN: Unable to attach genre %d to accession %d", genreID, a.ID)
+		}
+	}
+}
+
+// WriteDigitalTransfer writes physical xfer info for an accession to the DB
+func (a *Accession) WriteDigitalTransfer(db *dbx.DB) error {
+	log.Printf("Commmit digital transfer details for accession %d", a.ID)
+	a.Digital.AccessionID = a.ID
+	err := db.Model(&a.Digital).Insert()
+	if err != nil {
+		log.Printf("Unable to create digital record: %s", err.Error())
+		return err
+	}
+
+	log.Printf("Commmit digital files")
+	for _, file := range a.Digital.Files {
+		_, err := db.Insert("digital_files", dbx.Params{
+			"digital_accession_id": a.Digital.ID,
+			"filename":             file,
+		}).Execute()
+		if err != nil {
+			log.Printf("WARN: Unable to attach file %s to digital accession %d", file, a.Digital.ID)
+		}
+	}
+
+	log.Printf("Commmit digital record types")
+	for _, IDStr := range a.Digital.RecordTypeIDs {
+		ID, _ := strconv.Atoi(IDStr)
+		_, err := db.Insert("accession_record_types", dbx.Params{
+			"accession_id":   a.ID,
+			"record_type_id": ID,
+		}).Execute()
+		if err != nil {
+			log.Printf("WARN: Unable to attach record type %d to accession %d", ID, a.ID)
+		}
+	}
+	return nil
+}
+
+// WritePhysicalTransfer writes physical xfer info for an accession to the DB
+func (a *Accession) WritePhysicalTransfer(db *dbx.DB) error {
+	log.Printf("Commmit physical transfer details")
+	a.Physical.AccessionID = a.ID
+	err := db.Model(&a.Physical).Insert()
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Commmit physical transfer media carriers")
+	for _, IDStr := range a.Physical.MediaCarrierIDs {
+		ID, _ := strconv.Atoi(IDStr)
+		_, err := db.Insert("physical_media_carriers", dbx.Params{
+			"physical_accession_id": a.Physical.ID,
+			"media_carrier_id":      ID,
+		}).Execute()
+		if err != nil {
+			log.Printf("WARN: Unable to attach media carrier %d to physical accession %d", ID, a.Physical.ID)
+		}
+	}
+
+	log.Printf("Commmit physical resord types")
+	for _, IDStr := range a.Physical.RecordTypeIDs {
+		ID, _ := strconv.Atoi(IDStr)
+		_, err := db.Insert("accession_record_types", dbx.Params{
+			"accession_id":   a.ID,
+			"record_type_id": ID,
+		}).Execute()
+		if err != nil {
+			log.Printf("WARN: Unable to attach record type %d to accession %d", ID, a.ID)
+		}
+	}
+	return nil
 }
 
 // Submit accepts a transfer submission, creates a DB record and kicks off submission
 // processing. When complete, an email is sent to the submitter
 func (svc *ServiceContext) Submit(c *gin.Context) {
-	var submission Submission
-	err := c.BindJSON(&submission)
+	var accession Accession
+	err := c.ShouldBindJSON(&accession)
 	if err != nil {
 		log.Printf("ERROR: Unable to parse request: %s", err.Error())
 		c.String(http.StatusBadRequest, err.Error())
-	}
-	log.Printf("Received: %+v", submission)
-
-	log.Printf("Processing Submitter info...")
-	existingUser := User{}
-	err = existingUser.FindByEmail(svc.DB, submission.User.Email)
-	if err != nil {
-		log.Printf("ERROR: Submitter %s not found in DB - %s", submission.User.Email, err.Error())
-		c.String(http.StatusBadRequest, "User %s does not exist", submission.User.Email)
 		return
 	}
-	submission.User.ID = existingUser.ID
-	submission.User.UpdatedAt = time.Now()
-	log.Printf("Found user %+v => updating fields to %+v", existingUser, submission.User)
-	err = svc.DB.Model(&submission.User).Exclude("Verified", "VerifyToken", "Admin", "CreatedAt").Update()
+	log.Printf("Received: %+v", accession)
+
+	log.Printf("Update existing user %d:%s", accession.User.ID, accession.User.Email)
+	accession.User.UpdatedAt = time.Now()
+	err = svc.DB.Model(&accession.User).Exclude("Verified", "VerifyToken", "Admin", "CreatedAt", "email").Update()
 	if err != nil {
-		log.Printf("WARN: Unable to ubdate %s - %s", submission.User.Email, err.Error())
+		log.Printf("WARN: Unable to update %s - %s", accession.User.Email, err.Error())
 	}
 
-	log.Printf("Process common accession information...")
+	log.Printf("Add new accession record")
+	accession.UserID = accession.User.ID
+	err = svc.DB.Model(&accession).Insert()
+	if err != nil {
+		log.Printf("WARN: Unable to add accession %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+	}
+
+	accession.WriteGenres(svc.DB)
+	if accession.PhysicalTransfer {
+		accession.WritePhysicalTransfer(svc.DB)
+	}
+	if accession.DigitalTransfer {
+		accession.WriteDigitalTransfer(svc.DB)
+	}
+
 	c.String(http.StatusNotImplemented, "WOOF")
 }
 

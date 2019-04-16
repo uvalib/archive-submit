@@ -17,13 +17,13 @@ import (
 
 // User maps the users table into a structure
 type User struct {
-	ID          string    `json:"id"`
-	FirstName   string    `json:"firstName" db:"first_name" form:"fname" binding:"required"`
-	LastName    string    `json:"lastName" db:"last_name" form:"lname" binding:"required"`
-	Title       string    `json:"title" form:"title" binding:"required"`
-	Affiliation string    `json:"affiliation"  db:"university_affiliation" form:"affiliation" binding:"required"`
-	Email       string    `json:"email" form:"email" binding:"required"`
-	Phone       string    `json:"phone" form:"phone" binding:"required"`
+	ID          int       `json:"id"`
+	FirstName   string    `json:"firstName" binding:"required" db:"first_name"`
+	LastName    string    `json:"lastName" binding:"required" db:"last_name"`
+	Title       string    `json:"title" binding:"required" form:"title"`
+	Affiliation string    `json:"affiliation"  binding:"required" db:"university_affiliation"`
+	Email       string    `json:"email" binding:"required" form:"email"`
+	Phone       string    `json:"phone" binding:"required" form:"phone"`
 	Verified    bool      `json:"verified"`
 	VerifyToken string    `json:"token"  db:"verify_token" `
 	Admin       bool      `json:"-"`

@@ -41,7 +41,7 @@
          <div class="pure-u-1-1">
             <label>Does this transfer include items on digital media carriers?</label>
             <label class="pure-radio inline">
-               <input v-model="hasDigital" type="radio" name="has-digital" value="1" checked>
+               <input v-model="hasDigital" type="radio" name="has-digital" value="1">
                Yes
             </label>
             <label class="pure-radio inline">
@@ -49,44 +49,44 @@
                No
             </label>
          </div>
-         <div v-if="hasDigital === 'yes'" class="digital-content-questions">
+         <div class="digital-content-questions">
             <div class="pure-u-1-1 gap">
-               <label>
+               <label class="digital-info">
                   Describe Technical Information
                   <span class="note">(e.g., file structure and organization, software that created files, OS, hardware, naming conventions, and original location).</span>
                </label>
-               <textarea v-model="techInfo" class="pure-u-1-1" id="tech-description"></textarea>
+               <textarea v-model="techInfo" class="digital-info pure-u-1-1" id="tech-description"></textarea>
             </div>
             
             <div class="pure-u-1-1">
-               <label>
+               <label class="digital-info">
                   Media carriers
                   <span class="note">(check all that apply)</span>
                </label>
                <div class="choices">
-                  <span v-for="mc in mediaCarriers" :key="mc.id">
-                     <label class="pure-checkbox inline">
-                        <input type="checkbox" name="media-carrier" :value="mc.id" v-model="mediaCarriers">
+                  <span v-for="mc in mediaCarrierChoices" :key="mc.id">
+                     <label class="digital-info pure-checkbox inline">
+                        <input type="checkbox" class="digital-info" name="media-carrier" :value="mc.id" v-model="mediaCarriers">
                         {{ mc.name }}
                      </label>
                   </span>
                </div>
             </div>
             <div class="pure-u-1-1 gap">
-               <label>
+               <label class="digital-info">
                   Please estimate the number of each media format and their types 
                   <span class="note">(e.g., 5 1/4" disk, 3 1/2" disk, CD-ROM, thumb drive, etc.)</span>
                </label>
-               <textarea v-model="mediaCount" class="pure-u-1-1" id="media-count"></textarea>
+               <textarea v-model="mediaCount" class="digital-info pure-u-1-1" id="media-count"></textarea>
             </div>
             <div class="pure-u-1-1">
-               <label>Do the digital records include any software?</label>
-               <label class="pure-radio inline">
-                  <input type="radio" name="has-software" value="1" v-model="hasSoftware">
+               <label class="digital-info">Do the digital records include any software?</label>
+               <label class="digital-info pure-radio inline">
+                  <input type="radio" class="digital-info" name="has-software" value="1" v-model="hasSoftware">
                   Yes
                </label>
-               <label class="pure-radio inline">
-                  <input type="radio" name="has-software" value="0" checked v-model="hasSoftware">
+               <label class="digital-info pure-radio inline">
+                  <input type="radio" class="digital-info" name="has-software" value="0" checked v-model="hasSoftware">
                   No
                </label>
             </div>
@@ -103,6 +103,23 @@ export default {
    components: {
       AccordionContent: AccordionContent
    },
+   watch: {
+      hasDigital: function (val) {
+         let eles = document.getElementsByClassName("digital-info")
+         if (val === "0") {
+            this.$store.commit("clearPhysicalXefrDigitalInfo")
+         } 
+         Array.from(eles).forEach( function(ele) {
+            ele.readOnly = (val === "0")
+            ele.disabled = (val === "0")
+            if (val == "0") {
+               ele.classList.add("ghosted")
+            } else {
+                ele.classList.remove("ghosted")
+            }
+         })
+      }
+   },
    computed: {
       physicalRecordTypes() {
          return this.$store.getters.physicalRecordTypes
@@ -110,8 +127,8 @@ export default {
       transferMethods() {
          return this.$store.getters.transferMethods
       },
-      mediaCarriers() {
-         return this.$store.getters.mediaCarriers
+      mediaCarrierChoices() {
+         return this.$store.getters.mediaCarrierChoices
       },
       ...mapFields([
          'physical.dateRange',
@@ -133,6 +150,9 @@ export default {
 </script>
 
 <style scoped>
+.digital-info.ghosted {
+   opacity: 0.5;
+}
 .note {
    color: #999;
   font-size: 0.85em;

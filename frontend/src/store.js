@@ -14,9 +14,10 @@ const state = {
   physicalTransfer: false,
   digitalRecordTypes: [],
   physicalRecordTypes: [],
-  mediaCarriers: [],
+  mediaCarrierChoices: [],
   transferMethods: [],
   user: {
+    id: 0,
     firstName: '',
     lastName: '',
     email: '',
@@ -43,12 +44,12 @@ const state = {
     dateRange: '',
     boxInfo: '',
     selectedTypes: [],
-    transferMethod: '',
-    hasDigital: 'yes',
+    transferMethod: 0,
+    hasDigital: '1',
     techInfo: '',
     mediaCarriers: [],
     mediaCount: '',
-    hasSoftware: 'no'
+    hasSoftware: '0'
   }
 }
 
@@ -87,8 +88,8 @@ const getters = {
   digitalRecordTypes: state => {
     return state.digitalRecordTypes
   },
-  mediaCarriers: state => {
-    return state.mediaCarriers
+  mediaCarrierChoices: state => {
+    return state.mediaCarrierChoices
   },
   transferMethods: state => {
     return state.transferMethods
@@ -107,11 +108,17 @@ const getters = {
 // this.$store.commit('mutation_name') or called from asynchronous actions
 const mutations = {
   updateField,
+  clearPhysicalXefrDigitalInfo(state) {
+    state.physical.techInfo =  ''
+    state.physical.mediaCarriers = []
+    state.physical.mediaCount = ''
+    state.physical.hasSoftware = '0'
+  },
   setGenres (state, genres) {
     state.genres = genres
   },
-  setMediaCarriers (state, carriers) {
-    state.mediaCarriers = carriers
+  setMediaCarrierChoices (state, carriers) {
+    state.mediaCarrierChoices = carriers
   },
   setTransferMethods (state, methods) {
     state.transferMethods = methods
@@ -128,7 +135,7 @@ const mutations = {
     state.user = {firstName: "", lastName:"", title:"", affiliation:"", email:email, phone:""}
   },
   clearUser(state) {
-    state.user = {firstName: "", lastName:"", title:"", affiliation:"", email:"", phone:""}
+    state.user = {id: 0, firstName: "", lastName:"", title:"", affiliation:"", email:"", phone:""}
   },
   setError (state, error) {
     state.error = error
@@ -179,10 +186,10 @@ const actions = {
   },
   getMediaCarriers( ctx ) {
     axios.get("/api/media-carriers").then((response)  =>  {
-      ctx.commit('setMediaCarriers', response.data )
+      ctx.commit('setMediaCarrierChoices', response.data )
     }).catch(() => {
-      ctx.commit('setMediaCarriers', []) 
-      ctx.commit('setError', "Internal Error: Unable to get genres")
+      ctx.commit('setMediaCarrierChoices', []) 
+      ctx.commit('setError', "Internal Error: Unable to get media carriers")
     })
   },
   getTransferMethods( ctx ) {
@@ -190,7 +197,7 @@ const actions = {
       ctx.commit('setTransferMethods', response.data )
     }).catch(() => {
       ctx.commit('setTransferMethods', []) 
-      ctx.commit('setError', "Internal Error: Unable to get genres")
+      ctx.commit('setError', "Internal Error: Unable to get transfer methods")
     })
   },
   getRecordTypes( ctx ) {
@@ -209,9 +216,9 @@ const actions = {
       ctx.commit('setError', "Internal Error: Unable to get uploadID") 
     })
   },
-  removeUploadedFile( ctx, filename ) { 
-    ctx.commit("removeUploadedFile",filename)
-    axios.delete("/api/upload/"+filename+"?key="+ctx.getters.uploadID)
+  removeUploadedFile( ctx, file ) { 
+    ctx.commit("removeUploadedFile",file.name)
+    axios.delete("/api/upload/"+file.name+"?key="+ctx.getters.uploadID)
   }
 }
 
@@ -220,7 +227,7 @@ const errorPlugin = store => {
   store.subscribe((mutation) => {
     if (mutation.type === "setError") {
       if ( mutation.payload != null ) {
-        setTimeout( ()=>{ store.commit('setError', null)}, 6000)
+        setTimeout( ()=>{ store.commit('setError', null)}, 10000)
       }
     }
   })

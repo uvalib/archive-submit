@@ -34,6 +34,7 @@ func (svc *ServiceContext) Init(cfg *ServiceConfig) {
 		log.Printf("FATAL: Unable to make connection: %s", err.Error())
 		os.Exit(1)
 	}
+	db.LogFunc = log.Printf
 	svc.DB = db
 }
 
