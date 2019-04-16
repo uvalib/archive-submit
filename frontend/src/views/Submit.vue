@@ -105,8 +105,8 @@ export default {
           delete json.physical.hasSoftware 
         }
       }
-      axios.post("/api/submit", json).then((response)  =>  {
-        this.submitted = true
+      axios.post("/api/submit", json).then((/*response*/)  =>  {
+        this.$store.commit("clearSubmissionData") 
         this.$router.push("thanks")
       }).catch((error) => {
         this.$store.commit("setError",error.response.data) 

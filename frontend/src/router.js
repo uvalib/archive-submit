@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Access from './views/Access.vue'
 import Submit from './views/Submit.vue'
+import Thanks from './views/Thanks.vue'
 import Admin from './views/Admin.vue'
 import Forbidden from './views/Forbidden.vue'
 import Verify from './views/Verify.vue'
@@ -40,6 +41,11 @@ export default new Router({
           next()
         }
       }
+    },
+    {
+      path: '/thanks',
+      name: 'thanks',
+      component: Thanks
     },
     {
       path: '/verify/:token',

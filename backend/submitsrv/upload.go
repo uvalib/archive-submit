@@ -78,11 +78,11 @@ func (a *Accession) TableName() string {
 }
 
 // WriteGenres writes genre info for an accession to the DB
-func (a *Accession) WriteGenres(db *dbx.DB) {
+func (a *Accession) WriteGenres(tx *dbx.Tx) {
 	log.Printf("Commmit genres")
 	for _, genreIDStr := range a.GenreIDs {
 		genreID, _ := strconv.Atoi(genreIDStr)
-		_, err := db.Insert("accession_genres", dbx.Params{
+		_, err := tx.Insert("accession_genres", dbx.Params{
 			"accession_id": a.ID,
 			"genre_id":     genreID,
 		}).Execute()
@@ -92,31 +92,31 @@ func (a *Accession) WriteGenres(db *dbx.DB) {
 	}
 }
 
-// WriteDigitalTransfer writes physical xfer info for an accession to the DB
-func (a *Accession) WriteDigitalTransfer(db *dbx.DB) error {
+// WriteDigitalTransfer writes digital xfer info for an accession to the DB
+func (a *Accession) WriteDigitalTransfer(tx *dbx.Tx) error {
 	log.Printf("Commmit digital transfer details for accession %d", a.ID)
 	a.Digital.AccessionID = a.ID
-	err := db.Model(&a.Digital).Insert()
+	err := tx.Model(&a.Digital).Insert()
 	if err != nil {
-		log.Printf("Unable to create digital record: %s", err.Error())
 		return err
 	}
 
 	log.Printf("Commmit digital files")
 	for _, file := range a.Digital.Files {
-		_, err := db.Insert("digital_files", dbx.Params{
+		_, err := tx.Insert("digital_files", dbx.Params{
 			"digital_accession_id": a.Digital.ID,
 			"filename":             file,
 		}).Execute()
 		if err != nil {
-			log.Printf("WARN: Unable to attach file %s to digital accession %d", file, a.Digital.ID)
+			log.Printf("ERROR: Unable to attach file %s to digital accession %d", file, a.Digital.ID)
+			return err
 		}
 	}
 
 	log.Printf("Commmit digital record types")
 	for _, IDStr := range a.Digital.RecordTypeIDs {
 		ID, _ := strconv.Atoi(IDStr)
-		_, err := db.Insert("accession_record_types", dbx.Params{
+		_, err := tx.Insert("accession_record_types", dbx.Params{
 			"accession_id":   a.ID,
 			"record_type_id": ID,
 		}).Execute()
@@ -128,10 +128,10 @@ func (a *Accession) WriteDigitalTransfer(db *dbx.DB) error {
 }
 
 // WritePhysicalTransfer writes physical xfer info for an accession to the DB
-func (a *Accession) WritePhysicalTransfer(db *dbx.DB) error {
+func (a *Accession) WritePhysicalTransfer(tx *dbx.Tx) error {
 	log.Printf("Commmit physical transfer details")
 	a.Physical.AccessionID = a.ID
-	err := db.Model(&a.Physical).Insert()
+	err := tx.Model(&a.Physical).Insert()
 	if err != nil {
 		return err
 	}
@@ -139,7 +139,7 @@ func (a *Accession) WritePhysicalTransfer(db *dbx.DB) error {
 	log.Printf("Commmit physical transfer media carriers")
 	for _, IDStr := range a.Physical.MediaCarrierIDs {
 		ID, _ := strconv.Atoi(IDStr)
-		_, err := db.Insert("physical_media_carriers", dbx.Params{
+		_, err := tx.Insert("physical_media_carriers", dbx.Params{
 			"physical_accession_id": a.Physical.ID,
 			"media_carrier_id":      ID,
 		}).Execute()
@@ -151,7 +151,7 @@ func (a *Accession) WritePhysicalTransfer(db *dbx.DB) error {
 	log.Printf("Commmit physical resord types")
 	for _, IDStr := range a.Physical.RecordTypeIDs {
 		ID, _ := strconv.Atoi(IDStr)
-		_, err := db.Insert("accession_record_types", dbx.Params{
+		_, err := tx.Insert("accession_record_types", dbx.Params{
 			"accession_id":   a.ID,
 			"record_type_id": ID,
 		}).Execute()
@@ -182,22 +182,37 @@ func (svc *ServiceContext) Submit(c *gin.Context) {
 	}
 
 	log.Printf("Add new accession record")
+	tx, _ := svc.DB.Begin()
 	accession.UserID = accession.User.ID
-	err = svc.DB.Model(&accession).Insert()
+	err = tx.Model(&accession).Insert()
 	if err != nil {
-		log.Printf("WARN: Unable to add accession %s", err.Error())
-		c.String(http.StatusInternalServerError, err.Error())
+		log.Printf("ERROR: Unable to add accession %s", err.Error())
+		tx.Rollback()
+		c.String(http.StatusInternalServerError, "Unable to create accession record")
+		return
 	}
 
-	accession.WriteGenres(svc.DB)
+	accession.WriteGenres(tx)
 	if accession.PhysicalTransfer {
-		accession.WritePhysicalTransfer(svc.DB)
+		perr := accession.WritePhysicalTransfer(tx)
+		if perr != nil {
+			log.Printf("ERROR: Unable to write physical xfer: %s", perr.Error())
+			tx.Rollback()
+			c.String(http.StatusInternalServerError, "Unable to create physical transfer record")
+			return
+		}
 	}
 	if accession.DigitalTransfer {
-		accession.WriteDigitalTransfer(svc.DB)
+		derr := accession.WriteDigitalTransfer(tx)
+		if derr != nil {
+			log.Printf("ERROR: Unable to write digital xfer: %s", derr.Error())
+			tx.Rollback()
+			c.String(http.StatusInternalServerError, "Unable to create digital transfer record")
+			return
+		}
 	}
-
-	c.String(http.StatusNotImplemented, "WOOF")
+	tx.Commit()
+	c.String(http.StatusOK, "accepted")
 }
 
 // GetSubmissionIdentifier will generate an unique token to identify a new submission

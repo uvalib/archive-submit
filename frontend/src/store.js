@@ -114,6 +114,13 @@ const mutations = {
     state.physical.mediaCount = ''
     state.physical.hasSoftware = '0'
   },
+  clearSubmissionData(state) {
+    state.general = { summary: '', activities: '', creator: '', selectedGenres: [],accessionType: 'new' }
+    state.digital = { uploadID: null, description: '', dateRange: '', selectedTypes: [], 
+      uploadedFiles: [], totalSizeBytes: 0 }
+    state.physical = { dateRange: '', boxInfo: '', selectedTypes: [], transferMethod: 0, hasDigital: '1',
+      techInfo: '', mediaCarriers: [], mediaCount: '', hasSoftware: '0' }
+  },
   setGenres (state, genres) {
     state.genres = genres
   },
@@ -177,42 +184,42 @@ const mutations = {
 // called from components like: this.$store.dispatch('action_name', data_object)
 const actions = {
   getGenres( ctx ) {
+    ctx.commit('setGenres', []) 
     axios.get("/api/genres").then((response)  =>  {
       ctx.commit('setGenres', response.data )
     }).catch(() => {
-      ctx.commit('setGenres', []) 
       ctx.commit('setError', "Internal Error: Unable to get genres")
     })
   },
   getMediaCarriers( ctx ) {
+    ctx.commit('setMediaCarrierChoices', []) 
     axios.get("/api/media-carriers").then((response)  =>  {
       ctx.commit('setMediaCarrierChoices', response.data )
     }).catch(() => {
-      ctx.commit('setMediaCarrierChoices', []) 
       ctx.commit('setError', "Internal Error: Unable to get media carriers")
     })
   },
   getTransferMethods( ctx ) {
+    ctx.commit('setTransferMethods', []) 
     axios.get("/api/transfer-methods").then((response)  =>  {
       ctx.commit('setTransferMethods', response.data )
     }).catch(() => {
-      ctx.commit('setTransferMethods', []) 
       ctx.commit('setError', "Internal Error: Unable to get transfer methods")
     })
   },
   getRecordTypes( ctx ) {
+    ctx.commit('setRecordTypes', []) 
     axios.get("/api/types").then((response)  =>  {
       ctx.commit('setRecordTypes', response.data )
     }).catch(() => {
-      ctx.commit('setRecordTypes', []) 
       ctx.commit('setError', "Internal Error: Unable to get record types") 
     })
   },
   getUploadID( ctx ) {
+    ctx.commit('setUploadID', "") 
     axios.get("/api/identifier").then((response)  =>  {
       ctx.commit('setUploadID', response.data )
     }).catch(() => {
-      ctx.commit('setUploadID', "") 
       ctx.commit('setError', "Internal Error: Unable to get uploadID") 
     })
   },
