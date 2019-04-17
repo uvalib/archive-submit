@@ -7,36 +7,36 @@
                <table class="pure-table  pure-table-bordered"> 
                   <thead>
                      <tr>
-                        <th/>
                         <th>Box Number</th>
                         <th>Records Group #</th>
-                        <th>Box Title</th>
-                        <th>Contents Description</th>
+                        <th style="width:175px">Box Title</th>
+                        <th style="width:400px">Contents Description</th>
                         <th>Dates</th>
+                        <th/>
                      </tr>
                   </thead>
                   <tr v-for="(item, idx) in inventory" :key="idx">
                      <template v-if="editIdx != idx">
-                        <td style="text-align:center">
-                           <i @click="editClicked" class="fas fa-edit" :data-idx="idx"></i>
-                           <i @click="removeClicked" class="fas fa-trash-alt" :data-idx="idx"></i>
-                        </td> 
                         <td>{{item.boxNum}}</td>
                         <td>{{item.recordGroup}}</td>
                         <td>{{item.title}}</td>
                         <td>{{item.description}}</td>
                         <td>{{item.dates}}</td>
+                        <td style="text-align:center; width: 40px; padding:8px 4px;">
+                           <i @click="editClicked" class="fas fa-edit" :data-idx="idx"></i>
+                           <i @click="removeClicked" class="right fas fa-trash-alt" :data-idx="idx"></i>
+                        </td> 
                      </template>
                      <template v-else>
-                        <td style="text-align:center">
-                           <i @click="okClicked" class="fas fa-check-circle"></i>
-                           <i @click="cancelClicked" class="fas fa-window-close"></i>
-                        </td> 
-                        <td class="edit" ><input type="text" v-model="editItem.boxNum"/></td>
+                        <td class="edit" ><input id="first" type="text" v-model="editItem.boxNum"/></td>
                         <td class="edit" ><input type="text" v-model="editItem.recordGroup"/></td>
                         <td class="edit" ><input type="text" v-model="editItem.title"/></td>
                         <td class="edit" ><textarea v-model="editItem.description"></textarea></td>
                         <td class="edit" ><input type="text" v-model="editItem.dates"/></td>
+                        <td style="text-align:center; width: 40px; padding:8px 4px;">
+                           <i @click="okClicked" class="fas fa-check-circle"></i>
+                           <i @click="cancelClicked" class="right fas fa-window-close"></i>
+                        </td> 
                      </template>
                   </tr>
                </table>
@@ -84,6 +84,9 @@ export default {
          let idx = event.target.dataset.idx
          this.editIdx = idx
          this.editItem = this.$store.getters.inventoryItem(idx)
+         setTimeout( function() {
+            document.getElementById("first").focus()
+         }, 100)
       },
       cancelClicked() {
          this.editIdx = -1
@@ -102,7 +105,9 @@ export default {
 i.fas {
    cursor: pointer;
    opacity: 0.5;
-   margin-left:10px;
+}
+i.fas.right {
+   margin-left: 5px;
 }
 i.fas:hover {
    opacity: 1;
@@ -124,7 +129,7 @@ span.pure-button  {
 table {
    width:100%;
 }
-.content table td input {
+.content table td input,  .content table td textarea {
    margin: 0;
    width: 100%;
    border-radius: 0;
