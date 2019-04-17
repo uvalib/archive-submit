@@ -7,6 +7,7 @@ Vue.use(Vuex)
 
 // root state object. Holds all of the state for the system
 const state = {
+  showInventory: false,
   genres: [],
   error: null,
   isUVA: false,
@@ -16,6 +17,7 @@ const state = {
   physicalRecordTypes: [],
   mediaCarrierChoices: [],
   transferMethods: [],
+  inventory: [],
   user: {
     id: 0,
     firstName: '',
@@ -58,6 +60,15 @@ const state = {
 // as a function. Access as a property like: this.$store.getters.NAME
 const getters = {
   getField,
+  showInventory: state => {
+    return state.showInventory
+  },
+  inventory: state => {
+    return state.inventory
+  },
+  inventoryItem: (state) => (idx) => {
+    return state.inventory[idx]
+  },
   uploadID: state => {
     return state.digital.uploadID
   },
@@ -114,7 +125,24 @@ const mutations = {
     state.physical.mediaCount = ''
     state.physical.hasSoftware = '0'
   },
+  clearInventory(state) {
+    state.inventory = []
+  },
+  addInventory(state) {
+    state.inventory.push({boxNum: '', recordGroup: '', title: '',
+      description:'', dates: '' })
+  },
+  updateInventory(state, idx, item) {
+    state.inventory[idx] = item
+  },
+  deleteInventory(state, idx) {
+    state.inventory.splice(idx, 1)
+  },
+  toggleInventory(state) {
+    state.showInventory = !state.showInventory
+  },
   clearSubmissionData(state) {
+    state.inventory = []
     state.general = { summary: '', activities: '', creator: '', selectedGenres: [],accessionType: 'new' }
     state.digital = { uploadID: null, description: '', dateRange: '', selectedTypes: [], 
       uploadedFiles: [], totalSizeBytes: 0 }
