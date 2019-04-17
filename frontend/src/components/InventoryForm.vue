@@ -21,22 +21,22 @@
                            <i @click="editClicked" class="fas fa-edit" :data-idx="idx"></i>
                            <i @click="removeClicked" class="fas fa-trash-alt" :data-idx="idx"></i>
                         </td> 
-                        <td>readonly</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>{{item.boxNum}}</td>
+                        <td>{{item.recordGroup}}</td>
+                        <td>{{item.title}}</td>
+                        <td>{{item.description}}</td>
+                        <td>{{item.dates}}</td>
                      </template>
                      <template v-else>
                         <td style="text-align:center">
                            <i @click="okClicked" class="fas fa-check-circle"></i>
                            <i @click="cancelClicked" class="fas fa-window-close"></i>
                         </td> 
-                        <td>EDIT</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td class="edit" ><input type="text" v-model="editItem.boxNum"/></td>
+                        <td class="edit" ><input type="text" v-model="editItem.recordGroup"/></td>
+                        <td class="edit" ><input type="text" v-model="editItem.title"/></td>
+                        <td class="edit" ><textarea v-model="editItem.description"></textarea></td>
+                        <td class="edit" ><input type="text" v-model="editItem.dates"/></td>
                      </template>
                   </tr>
                </table>
@@ -58,7 +58,7 @@ export default {
    data: function () {
       return {
          editIdx: -1,
-         origItem: null
+         editItem: null
       }
    },
    computed: {
@@ -83,13 +83,16 @@ export default {
       editClicked(event) {
          let idx = event.target.dataset.idx
          this.editIdx = idx
-         this.origItem = this.$store.getters.inventoryItem(idx)
-         alert(this.origItem)
+         this.editItem = this.$store.getters.inventoryItem(idx)
       },
       cancelClicked() {
          this.editIdx = -1
+         this.editItem = null
       },
       okClicked() {
+          this.$store.commit("updateInventory", {idx:this.editIdx, item:this.editItem} )
+          this.editIdx = -1
+          this.editItem = null
       },
    }
 };
@@ -120,6 +123,18 @@ span.pure-button  {
 }
 table {
    width:100%;
+}
+.content table td input {
+   margin: 0;
+   width: 100%;
+   border-radius: 0;
+   box-shadow: none;
+   border: none;
+   outline:none;
+   background: aliceblue;
+}
+.content table td.edit {
+   padding:0px;
 }
 .content {
    padding: 10px;

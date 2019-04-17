@@ -132,8 +132,9 @@ const mutations = {
     state.inventory.push({boxNum: '', recordGroup: '', title: '',
       description:'', dates: '' })
   },
-  updateInventory(state, idx, item) {
-    state.inventory[idx] = item
+  updateInventory(state, payload) {
+    console.log(payload)
+    state.inventory[payload.idx] = payload.item
   },
   deleteInventory(state, idx) {
     state.inventory.splice(idx, 1)
