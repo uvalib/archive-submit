@@ -27,19 +27,36 @@ func (da *DigitalAccession) TableName() string {
 	return "digital_accessions"
 }
 
-// PhysicalAccession contains data supporting digital file accessions
+// InventoryItem contains data to describe a physical inventory item
+type InventoryItem struct {
+	ID              int    `json:"-"`
+	PhysAccessionID int    `json:"-" db:"physical_accession_id"`
+	BoxNumber       string `json:"boxNum" db:"box_number"`
+	RecordGroup     string `json:"recordGroup" db:"record_group_number"`
+	Title           string `json:"title" db:"box_title"`
+	Description     string `json:"description" db:"description"`
+	Dates           string `json:"dates" db:"dates"`
+}
+
+// TableName defines the expected DB table name that holds data for inventory items
+func (da *InventoryItem) TableName() string {
+	return "inventory_items"
+}
+
+// PhysicalAccession contains data supporting physical file accessions
 type PhysicalAccession struct {
-	ID               int      `json:"-"`
-	AccessionID      int      `json:"-" db:"accession_id"`
-	DateRange        string   `json:"dateRange" db:"date_range"`
-	BoxInfo          string   `json:"boxInfo" db:"box_info"`
-	RecordTypeIDs    []string `json:"selectedTypes" db:"-"`
-	TransferMethodID int      `json:"transferMethod" db:"transfer_method_id"`
-	HasDigital       bool     `json:"hasDigital" db:"has_digital"`
-	TechInfo         string   `json:"techInfo" db:"tech_description"`
-	MediaCarrierIDs  []string `json:"mediaCarriers" db:"-"`
-	MediaCount       string   `json:"mediaCount" db:"media_counts"`
-	HasSoftware      bool     `json:"hasSoftware" db:"has_software"`
+	ID               int             `json:"-"`
+	AccessionID      int             `json:"-" db:"accession_id"`
+	DateRange        string          `json:"dateRange" db:"date_range"`
+	BoxInfo          string          `json:"boxInfo" db:"box_info"`
+	RecordTypeIDs    []string        `json:"selectedTypes" db:"-"`
+	TransferMethodID int             `json:"transferMethod" db:"transfer_method_id"`
+	HasDigital       bool            `json:"hasDigital" db:"has_digital"`
+	TechInfo         string          `json:"techInfo" db:"tech_description"`
+	MediaCarrierIDs  []string        `json:"mediaCarriers" db:"-"`
+	MediaCount       string          `json:"mediaCount" db:"media_counts"`
+	HasSoftware      bool            `json:"hasSoftware" db:"has_software"`
+	Inventory        []InventoryItem `json:"inventory" db:"-"`
 }
 
 // TableName defines the expected DB table name that holds data for physical accessions
@@ -111,6 +128,7 @@ func (a *Accession) WriteDigitalTransfer(tx *dbx.Tx) error {
 		ID, _ := strconv.Atoi(IDStr)
 		_, err := tx.Insert("accession_record_types", dbx.Params{
 			"accession_id":   a.ID,
+			"accession_type": "digital",
 			"record_type_id": ID,
 		}).Execute()
 		if err != nil {
@@ -141,17 +159,28 @@ func (a *Accession) WritePhysicalTransfer(tx *dbx.Tx) error {
 		}
 	}
 
-	log.Printf("Commmit physical resord types")
+	log.Printf("Commmit physical record types")
 	for _, IDStr := range a.Physical.RecordTypeIDs {
 		ID, _ := strconv.Atoi(IDStr)
 		_, err := tx.Insert("accession_record_types", dbx.Params{
 			"accession_id":   a.ID,
+			"accession_type": "physical",
 			"record_type_id": ID,
 		}).Execute()
 		if err != nil {
 			log.Printf("WARN: Unable to attach record type %d to accession %d", ID, a.ID)
 		}
 	}
+
+	log.Printf("Commmit physical inventory")
+	for _, item := range a.Physical.Inventory {
+		item.PhysAccessionID = a.Physical.ID
+		err = tx.Model(&item).Insert()
+		if err != nil {
+			log.Printf("WARN: Unable to attach inventory %+v to physical accession %d", item, a.Physical.ID)
+		}
+	}
+
 	return nil
 }
 
