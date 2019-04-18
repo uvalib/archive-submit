@@ -91,16 +91,14 @@ func (user *User) SendVerifyEmail(baseURL string, smtpCfg SMTPConfig) {
 
 // FindByEmail finds a user by email
 func (user *User) FindByEmail(db *dbx.DB, email string) error {
-	q := db.NewQuery(`select id,last_name,first_name,email,title,university_affiliation,
-		phone,verified,verify_token from users where email={:email} limit 1`)
+	q := db.NewQuery(`select * from users where email={:email} limit 1`)
 	q.Bind(dbx.Params{"email": email})
 	return q.One(user)
 }
 
 // FindByToken finds a user by verfy_token
 func (user *User) FindByToken(db *dbx.DB, token string) error {
-	q := db.NewQuery(`select id,last_name,first_name,email,title,university_affiliation,
-		phone,verified,verify_token from users where verify_token={:token} limit 1`)
+	q := db.NewQuery(`select * from users where verify_token={:token} limit 1`)
 	q.Bind(dbx.Params{"token": token})
 	return q.One(user)
 }

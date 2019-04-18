@@ -33,7 +33,7 @@ func main() {
 	api := router.Group("/api")
 	{
 		api.GET("/genres", svc.GetGenres)
-		api.GET("/identifier", svc.GetSubmissionIdentifier)
+		api.GET("/identifier", svc.GetUploadIdentifier)
 		api.GET("/types", svc.GetTypes)
 		api.GET("/transfer-methods", svc.GetTransferMethods)
 		api.GET("/media-carriers", svc.GetMediaCarriers)
