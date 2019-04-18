@@ -78,6 +78,9 @@ export default {
          let len = this.$store.getters.inventoryCount
          this.editIdx = len-1
          this.editItem = this.$store.getters.inventoryItem( this.editIdx )
+         setTimeout( function() {
+            document.getElementById("first").focus()
+         }, 100)
       },
       removeClicked(event) {
          let idx = event.target.dataset.idx
