@@ -17,7 +17,6 @@ const state = {
   physicalRecordTypes: [],
   mediaCarrierChoices: [],
   transferMethods: [],
-  inventory: [],
   user: {
     id: 0,
     firstName: '',
@@ -27,7 +26,7 @@ const state = {
     title: '',
     affiliation: ''
   },
-  general: {
+  accession: {
     summary: '',
     activities: '',
     creator: '',
@@ -51,7 +50,8 @@ const state = {
     techInfo: '',
     mediaCarriers: [],
     mediaCount: '',
-    hasSoftware: '0'
+    hasSoftware: '0',
+    inventory: []
   }
 }
 
@@ -60,50 +60,14 @@ const state = {
 // as a function. Access as a property like: this.$store.getters.NAME
 const getters = {
   getField,
-  showInventory: state => {
-    return state.showInventory
-  },
-  inventory: state => {
-    return state.inventory
+  inventoryCount: state => {
+    return state.physical.inventory.length
   },
   inventoryItem: (state) => (idx) => {
-    return state.inventory[idx]
-  },
-  uploadID: state => {
-    return state.digital.uploadID
-  },
-  genres: state => {
-    return state.genres
-  },
-  error: state => {
-    return state.error
+    return state.physical.inventory[idx]
   },
   hasError: state => {
     return state.error != null && state.error != ""
-  },
-  isUVA: state => {
-    return state.isUVA
-  },
-  user: state => {
-    return state.user
-  },
-  digitalTransfer: state => {
-    return state.digitalTransfer
-  },
-  physicalTransfer: state => {
-    return state.physicalTransfer
-  },
-  physicalRecordTypes: state => {
-    return state.physicalRecordTypes
-  },
-  digitalRecordTypes: state => {
-    return state.digitalRecordTypes
-  },
-  mediaCarrierChoices: state => {
-    return state.mediaCarrierChoices
-  },
-  transferMethods: state => {
-    return state.transferMethods
   },
   digitalUploadSize: state => {
     let mb = state.digital.totalSizeBytes/(1000.0*1000.0)
@@ -126,29 +90,27 @@ const mutations = {
     state.physical.hasSoftware = '0'
   },
   clearInventory(state) {
-    state.inventory = []
+    state.physical.inventory = []
   },
   addInventory(state) {
-    state.inventory.push({boxNum: '', recordGroup: '', title: '',
+    state.physical.inventory.push({boxNum: '', recordGroup: '', title: '',
       description:'', dates: '' })
   },
   updateInventory(state, payload) {
-    console.log(payload)
-    state.inventory[payload.idx] = payload.item
+    state.physical.inventory[payload.idx] = payload.item
   },
   deleteInventory(state, idx) {
-    state.inventory.splice(idx, 1)
+    state.physical.inventory.splice(idx, 1)
   },
   toggleInventory(state) {
     state.showInventory = !state.showInventory
   },
   clearSubmissionData(state) {
-    state.inventory = []
-    state.general = { summary: '', activities: '', creator: '', selectedGenres: [],accessionType: 'new' }
+    state.accession = { summary: '', activities: '', creator: '', selectedGenres: [],accessionType: 'new' }
     state.digital = { uploadID: null, description: '', dateRange: '', selectedTypes: [], 
       uploadedFiles: [], totalSizeBytes: 0 }
     state.physical = { dateRange: '', boxInfo: '', selectedTypes: [], transferMethod: 0, hasDigital: '1',
-      techInfo: '', mediaCarriers: [], mediaCount: '', hasSoftware: '0' }
+      techInfo: '', mediaCarriers: [], mediaCount: '', hasSoftware: '0', inventory: [] }
   },
   setGenres (state, genres) {
     state.genres = genres

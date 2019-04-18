@@ -69,15 +69,13 @@ export default {
    },
    computed: {
       digitalRecordTypes() {
-         return this.$store.getters.digitalRecordTypes
-      },
-      uploadedFiles() {
-         return this.$store.getters.uploadedFiles
+         return this.$store.state.digitalRecordTypes
       },
       uploadSize() {
          return this.$store.getters.digitalUploadSize
       },
       ...mapFields([
+         'digital.uploadedFiles',
          'digital.summary',
          'digital.description',
          'digital.dateRange',

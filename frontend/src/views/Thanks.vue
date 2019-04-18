@@ -14,12 +14,13 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
 export default {
    name: "thanks",
    computed: {
-      user() {
-         return this.$store.getters.user
-      }
+     ...mapState({
+         user: state => state.user,
+      })
    }
 };
 </script>

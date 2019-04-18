@@ -12,10 +12,10 @@
           <SubmitterInfo/>
           <GeneralInfo/>
         </div>
-        <template v-if="showDigital">
+        <template v-if="digitalTransfer">
           <DigitalTransfer/>
         </template>
-        <template v-if="showPhysical">
+        <template v-if="physicalTransfer">
           <PhysicalTransfer/>
         </template>
       </fieldset>
@@ -31,6 +31,7 @@ import GeneralInfo from '@/components/GeneralInfo'
 import PhysicalTransfer from '@/components/PhysicalTransfer'
 import DigitalTransfer from '@/components/DigitalTransfer'
 import { mapGetters } from "vuex"
+import { mapState } from "vuex"
 import axios from 'axios'
 
 export default {
@@ -42,13 +43,15 @@ export default {
     PhysicalTransfer: PhysicalTransfer
   },
   computed: {
-      ...mapGetters(["hasError", "error","digitalTransfer", "physicalTransfer", "user"]),
-      showDigital() {
-        return this.digitalTransfer === true
-      },
-      showPhysical() {
-        return this.physicalTransfer === true
-      }
+       ...mapState({
+         error: state => state.error,
+         user: state => state.user,
+         accession: state => state.accession,
+         digital: state => state.digital,
+         physical: state => state.physical,
+         digitalTransfer: state => state.digitalTransfer,
+         physicalTransfer: state => state.physicalTransfer,
+      }),
   },
   created: function () {
     // see if the auth user cookie is set. If so, this page 
@@ -75,36 +78,30 @@ export default {
   methods: {
     submitClicked() {
       // clean up data from store (put into heirarchy / remove some fields) and send to server as an accession
-      let state = this.$store.state
-      let json = {
-        user: state.user,
-        summary: state.general.summary,
-        activities: state.general.activities,
-        creator: state.general.creator,
-        selectedGenres: state.general.selectedGenres,
-        accessionType: state.general.accessionType,
-        digitalTransfer: state.digitalTransfer,
-        physicalTransfer: state.physicalTransfer,
+      let json = this.accession
+      json.user = this.user
+      json.digitalTransfer = this.digitalTransfer
+      json.physicalTransfer = this.physicalTransfer
+      if (this.digitalTransfer) {
+        json.digital = this.digital
       }
-      if (state.digitalTransfer) {
-        json.digital = state.digital
-      }
-      if (state.physicalTransfer) { 
+      if (this.physicalTransfer) { 
         // NOTE: Clone the physical data here because we will convert some 
         // of it to int or bool to help back end processing. Don't want to mess 
         // up the store data
         json.physical = {}
-        Object.assign(json.physical, state.physical)
+        Object.assign(json.physical, this.physical)
         json.physical.transferMethod = parseInt(json.physical.transferMethod, 10)
         json.physical.hasDigital = (json.physical.hasDigital === "1")
         json.physical.hasSoftware = (json.physical.hasSoftware === "1")
-        if ( !state.physical.hasDigital) {
+        if ( !json.physical.hasDigital) {
           delete json.physical.techInfo 
           delete json.physical.mediaCarriers 
           delete json.physical.mediaCount 
           delete json.physical.hasSoftware 
         }
       }
+      // console.log(json)
       axios.post("/api/submit", json).then((/*response*/)  =>  {
         this.$store.commit("clearSubmissionData") 
         this.$router.push("thanks")

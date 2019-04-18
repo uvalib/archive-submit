@@ -51,14 +51,14 @@ import { mapFields } from 'vuex-map-fields'
 export default {
    computed: {
       genres: function() {
-         return this.$store.getters.genres;
+         return this.$store.state.genres;
       },
       ...mapFields([
-         'general.summary',
-         'general.activities',
-         'general.creator',
-         'general.selectedGenres',
-         'general.accessionType',
+         'accession.summary',
+         'accession.activities',
+         'accession.creator',
+         'accession.selectedGenres',
+         'accession.accessionType',
       ])
    }
 };

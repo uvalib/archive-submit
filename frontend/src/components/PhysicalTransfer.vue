@@ -105,7 +105,7 @@
             </div>
          </div>
       </AccordionContent>
-      <InventoryForm v-if="showModal"/>
+      <InventoryForm v-if="showInventory"/>
    </div>
 </template>
 
@@ -113,6 +113,7 @@
 import AccordionContent from "@/components/AccordionContent"
 import InventoryForm from "@/components/InventoryForm"
 import { mapFields } from 'vuex-map-fields'
+import { mapState } from "vuex"
 
 export default {
    components: {
@@ -137,18 +138,12 @@ export default {
       }
    },
    computed: {
-      showModal() {
-         return this.$store.getters.showInventory
-      },
-      physicalRecordTypes() {
-         return this.$store.getters.physicalRecordTypes
-      },
-      transferMethods() {
-         return this.$store.getters.transferMethods
-      },
-      mediaCarrierChoices() {
-         return this.$store.getters.mediaCarrierChoices
-      },
+      ...mapState({
+         mediaCarrierChoices: state => state.mediaCarrierChoices,
+         transferMethods: state => state.transferMethods,
+         physicalRecordTypes: state => state.physicalRecordTypes,
+         showInventory: state => state.showInventory,
+      }),
       ...mapFields([
          'physical.dateRange',
          'physical.boxInfo',

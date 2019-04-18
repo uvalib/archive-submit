@@ -89,11 +89,13 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapState } from "vuex"
 export default {
    name: "home",
    computed: {
-      ...mapGetters(["hasError", "error"])
+      ...mapState({
+         error: state => state.error,
+      })
    },
    methods: {
       uvaStatusClick: function(status) {
@@ -109,7 +111,7 @@ export default {
          this.$store.commit("setPhysicalTransfer", physical)
          this.$store.commit("setDigitalTransfer", digital)
          this.$store.commit("clearUser")
-         if (this.$store.getters.isUVA == false) {
+         if (this.$store.state.isUVA == false) {
             this.$router.push("access")
          } else {
             // This redirect to a page not under vue control resets 

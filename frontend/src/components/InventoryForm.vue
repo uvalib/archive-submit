@@ -63,7 +63,7 @@ export default {
    },
    computed: {
       inventory() {
-         return this.$store.getters.inventory
+         return this.$store.state.physical.inventory
       },
    },
    methods: {
@@ -75,6 +75,9 @@ export default {
       },
       addClicked() {
          this.$store.commit("addInventory")
+         let len = this.$store.getters.inventoryCount
+         this.editIdx = len-1
+         this.editItem = this.$store.getters.inventoryItem( this.editIdx )
       },
       removeClicked(event) {
          let idx = event.target.dataset.idx
@@ -102,6 +105,12 @@ export default {
 </script>
 
 <style scoped>
+i.fa-check-circle {
+   color:green;
+}
+i.fa-window-close {
+   color:firebrick;
+}
 i.fas {
    cursor: pointer;
    opacity: 0.5;

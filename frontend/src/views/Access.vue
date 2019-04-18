@@ -63,14 +63,17 @@
 <script>
 import axios from "axios"
 import SubmitterInfo from "@/components/SubmitterInfo"
-import { mapGetters } from "vuex"
+import { mapState } from "vuex"
 export default {
    name: "access",
    components: {
       SubmitterInfo: SubmitterInfo
    },
    computed: {
-      ...mapGetters(["user", "hasError", "error"])
+      ...mapState({
+         error: state => state.error,
+         user: state => state.user,
+      })
    },
    data: function() {
       return {
