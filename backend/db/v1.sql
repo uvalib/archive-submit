@@ -103,6 +103,12 @@ CREATE TABLE users (
    UNIQUE KEY (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO users (last_name, first_name, email, title, university_affiliation, phone, verified, admin, created_at)
+VALUES  
+	('Foster', 'Lou', 'lf6f@virginia.edu', 'Software Engineer', 'UVA Library', '(434) 982-2812', 1, 1, NOW()),
+   ('Work', 'Lauren', 'lw2cd@virginia.edu', 'Digital Preservation Librarian', 'UVA Library', '(434) 924-1348', 1, 1, NOW()),
+   ('Anderson', 'Bethany', 'bga3d@virginia.edu', 'University Archivist', 'UVA Library', '', 1, 1, NOW());
+
 --
 -- Create table for general accession info
 --
