@@ -10,15 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/rs/xid"
 )
-
-// GetUploadIdentifier will generate an unique token to identify digital content uploads
-// It will be used as a storage subdir for files as they are uploaded
-func (svc *ServiceContext) GetUploadIdentifier(c *gin.Context) {
-	id := xid.New()
-	c.String(http.StatusOK, id.String())
-}
 
 // UploadFile handles raw file uploads from the front end
 func (svc *ServiceContext) UploadFile(c *gin.Context) {

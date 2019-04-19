@@ -30,7 +30,6 @@ import SubmitterInfo from '@/components/SubmitterInfo'
 import GeneralInfo from '@/components/GeneralInfo'
 import PhysicalTransfer from '@/components/PhysicalTransfer'
 import DigitalTransfer from '@/components/DigitalTransfer'
-import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import axios from 'axios'
 
@@ -73,7 +72,7 @@ export default {
     }
     this.$store.dispatch('getGenres')
     this.$store.dispatch('getRecordTypes')
-    this.$store.dispatch('getUploadID')
+    this.$store.dispatch('getSubmissionID')
   },
   methods: {
     submitClicked() {

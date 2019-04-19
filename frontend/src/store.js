@@ -27,6 +27,7 @@ const state = {
     affiliation: ''
   },
   accession: {
+    identifier: null,
     summary: '',
     activities: '',
     creator: '',
@@ -34,7 +35,6 @@ const state = {
     accessionType: 'new'
   },
   digital: {
-    uploadID: null,
     description: '',
     dateRange: '',
     selectedTypes: [],
@@ -60,6 +60,9 @@ const state = {
 // as a function. Access as a property like: this.$store.getters.NAME
 const getters = {
   getField,
+  submissionID: state => {
+    return state.accession.identifier
+  },
   inventoryCount: state => {
     return state.physical.inventory.length
   },
@@ -106,8 +109,8 @@ const mutations = {
     state.showInventory = !state.showInventory
   },
   clearSubmissionData(state) {
-    state.accession = { summary: '', activities: '', creator: '', selectedGenres: [],accessionType: 'new' }
-    state.digital = { uploadID: null, description: '', dateRange: '', selectedTypes: [], 
+    state.accession = { identifier: '', summary: '', activities: '', creator: '', selectedGenres: [],accessionType: 'new' }
+    state.digital = { description: '', dateRange: '', selectedTypes: [], 
       uploadedFiles: [], totalSizeBytes: 0 }
     state.physical = { dateRange: '', boxInfo: '', selectedTypes: [], transferMethod: 0, hasDigital: '1',
       techInfo: '', mediaCarriers: [], mediaCount: '', hasSoftware: '0', inventory: [] }
@@ -138,8 +141,8 @@ const mutations = {
   setError (state, error) {
     state.error = error
   },
-  setUploadID (state, uploadID) {
-    state.digital.uploadID = uploadID
+  setSubmissionID (state, identifier) {
+    state.accession.identifier = identifier
   },
   addUploadedFile (state, file) {
     state.digital.uploadedFiles.push(file.name)
@@ -206,17 +209,17 @@ const actions = {
       ctx.commit('setError', "Internal Error: Unable to get record types") 
     })
   },
-  getUploadID( ctx ) {
-    ctx.commit('setUploadID', "") 
+  getSubmissionID( ctx ) {
+    ctx.commit('setSubmissionID', "") 
     axios.get("/api/identifier").then((response)  =>  {
-      ctx.commit('setUploadID', response.data )
+      ctx.commit('setSubmissionID', response.data )
     }).catch(() => {
-      ctx.commit('setError', "Internal Error: Unable to get uploadID") 
+      ctx.commit('setError', "Internal Error: Unable to get SubmissionID") 
     })
   },
   removeUploadedFile( ctx, file ) { 
     ctx.commit("removeUploadedFile",file.name)
-    axios.delete("/api/upload/"+file.name+"?key="+ctx.getters.uploadID)
+    axios.delete("/api/upload/"+file.name+"?key="+ctx.getters.submissionID)
   }
 }
 

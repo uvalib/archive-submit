@@ -8,13 +8,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
+	"github.com/rs/xid"
 )
 
 // DigitalAccession contains data supporting digital file accessions
 type DigitalAccession struct {
 	ID            int      `json:"-"`
 	AccessionID   int      `json:"-" db:"accession_id"`
-	UploadID      string   `json:"uploadID" db:"upload_id"`
 	Description   string   `json:"description" db:"description"`
 	DateRange     string   `json:"dateRange" db:"date_range"`
 	RecordTypeIDs []string `json:"selectedTypes" db:"-"`
@@ -69,6 +69,7 @@ func (pa *PhysicalAccession) TableName() string {
 // the to the DB when the Accession is written. Handle them as separate commits / reads
 type Accession struct {
 	ID               int               `json:"id" db:"id"`
+	Identifier       string            `json:"identifier" db:"identifier"`
 	UserID           int               `json:"-" db:"user_id"`
 	User             User              `json:"user" db:"-"`
 	Summary          string            `json:"summary" binding:"required" db:"description"`
@@ -235,4 +236,11 @@ func (svc *ServiceContext) Submit(c *gin.Context) {
 	}
 	tx.Commit()
 	c.String(http.StatusOK, "accepted")
+}
+
+// GetSubmissionIdentifier will generate an unique token to identify digital content uploads
+// It will be used as a storage subdir for files as they are uploaded
+func (svc *ServiceContext) GetSubmissionIdentifier(c *gin.Context) {
+	id := xid.New()
+	c.String(http.StatusOK, id.String())
 }

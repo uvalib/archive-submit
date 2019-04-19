@@ -92,7 +92,7 @@ export default {
          }
       },
       sendingEvent (file, xhr, formData) {
-         formData.append('identifier', this.$store.getters.uploadID);
+         formData.append('identifier', this.$store.getters.submissionID);
       },
   }
 }

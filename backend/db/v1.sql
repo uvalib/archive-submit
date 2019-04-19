@@ -115,11 +115,13 @@ VALUES
 DROP TABLE IF EXISTS accessions;
 CREATE TABLE accessions (
    id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   identifier varchar(25) not null,
    user_id int(11) NOT NULL,
    description text DEFAULT NULL,
    activities text DEFAULT NULL,
    creator text DEFAULT NULL,
    accession_type varchar(25), 
+   unique index(identifier),
    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -142,7 +144,6 @@ DROP TABLE IF EXISTS digital_accessions;
 CREATE TABLE digital_accessions (
    id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
    accession_id int(11) NOT NULL,
-   upload_id varchar(25) not null,
    upload_size int(11),
    date_range varchar(255),
    description text,
