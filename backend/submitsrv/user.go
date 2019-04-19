@@ -56,6 +56,40 @@ func (user *User) FullName() string {
 	return fmt.Sprintf("%s %s", user.FirstName, user.LastName)
 }
 
+// SendReceiptEmail will send the user (and admins) a transfer receipt email
+func (user *User) SendReceiptEmail(smtpCfg SMTPConfig, accession Accession, bcc []string) {
+	log.Printf("Rendering receipt email body")
+	var renderedEmail bytes.Buffer
+	tpl := template.Must(template.ParseFiles("templates/receipt_email.html"))
+	err := tpl.Execute(&renderedEmail, accession)
+	if err != nil {
+		log.Printf("ERROR: Unable to render receipt email: %s", err.Error())
+		return
+	}
+
+	log.Printf("Generate SMTP message")
+	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	subject := "Subject: UVA Archives Transfer Receipt\n"
+	toHdr := fmt.Sprintf("To: %s\n", accession.User.Email)
+	BCC := fmt.Sprintf("Bcc: %s\n", strings.Join(bcc, ","))
+	msg := []byte(subject + toHdr + BCC + mime + renderedEmail.String())
+
+	if smtpCfg.DevMode {
+		log.Printf("Email is in dev mode. Logging message instead of sending")
+		log.Printf("==================================================")
+		log.Printf("%s", msg)
+		log.Printf("==================================================")
+	} else {
+		log.Printf("Send verify email to %s", accession.User.Email)
+		to := []string{user.Email}
+		err := smtp.SendMail(fmt.Sprintf("%s:%d", smtpCfg.Host, smtpCfg.Port), nil, "no-reply@virginia.edu", to, msg)
+		if err != nil {
+			log.Printf("ERROR: Unable to send receipt email: %s", err.Error())
+			return
+		}
+	}
+}
+
 // SendVerifyEmail will send a verify email to a new user
 func (user *User) SendVerifyEmail(baseURL string, smtpCfg SMTPConfig) {
 	log.Printf("Rendering verification email body")

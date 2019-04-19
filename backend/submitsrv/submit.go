@@ -250,6 +250,17 @@ func (svc *ServiceContext) Submit(c *gin.Context) {
 		}
 	}
 	tx.Commit()
+
+	// Now send recepit to submitter and admins
+	q := svc.DB.NewQuery(`select email from users where admin=1`)
+	var emails []string
+	rows, _ := q.Rows()
+	for rows.Next() {
+		var email string
+		rows.Scan(&email)
+		emails = append(emails, email)
+	}
+	accession.User.SendReceiptEmail(svc.SMTP, accession, emails)
 	c.String(http.StatusOK, "accepted")
 }
 
