@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -199,6 +201,7 @@ func (svc *ServiceContext) Submit(c *gin.Context) {
 
 	log.Printf("Update existing user %d:%s", accession.User.ID, accession.User.Email)
 	accession.User.UpdatedAt = time.Now()
+	accession.User.FormatPhone()
 	err = svc.DB.Model(&accession.User).Exclude("Verified", "VerifyToken", "Admin", "CreatedAt", "email").Update()
 	if err != nil {
 		log.Printf("WARN: Unable to update %s - %s", accession.User.Email, err.Error())
@@ -232,6 +235,18 @@ func (svc *ServiceContext) Submit(c *gin.Context) {
 			tx.Rollback()
 			c.String(http.StatusInternalServerError, "Unable to create digital transfer record")
 			return
+		}
+
+		log.Printf("Moving pending upload files to transferred")
+		pendingDir := fmt.Sprintf("%s/%s", svc.UploadDir, "pending")
+		uploadDir := fmt.Sprintf("%s/%s", pendingDir, accession.Identifier)
+		xferDir := fmt.Sprintf("%s/%s", svc.UploadDir, "transferred")
+		os.MkdirAll(xferDir, 0777)
+		tgtDir := fmt.Sprintf("%s/%s", xferDir, accession.Identifier)
+		log.Printf("Moving pending upload files from %s to %s", uploadDir, tgtDir)
+		err = os.Rename(uploadDir, tgtDir)
+		if err != nil {
+			log.Printf("WARN: Unable to move pending files to submitted: %s", err.Error())
 		}
 	}
 	tx.Commit()

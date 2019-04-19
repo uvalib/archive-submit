@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/smtp"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -34,6 +35,11 @@ type User struct {
 // TableName defines the expected DB table name that holds data for users
 func (user *User) TableName() string {
 	return "users"
+}
+
+// FormatPhone will ensure phone numbers are in standard format (no spaces)
+func (user *User) FormatPhone() {
+	user.Phone = strings.Replace(user.Phone, " ", "", -1)
 }
 
 // IsValid makes sure all fields are set and look right
@@ -107,6 +113,7 @@ func (user *User) FindByToken(db *dbx.DB, token string) error {
 func (user *User) Create(db *dbx.DB) error {
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
+	user.FormatPhone()
 	return db.Model(user).Insert()
 }
 

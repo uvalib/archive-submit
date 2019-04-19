@@ -21,9 +21,14 @@ func (svc *ServiceContext) UploadFile(c *gin.Context) {
 		c.String(http.StatusBadRequest, "upload identifier missing")
 		return
 	}
+
+	// uploaded files are pending until a transfer submission is receved.
+	// at that point, they will be moved to a final transfer directory. all files
+	// in pending can me considered temporary and be purged.
 	log.Printf("Identifier received. Create upload directory.")
-	uploadDir := fmt.Sprintf("%s/%s", svc.UploadDir, uploadID)
-	os.Mkdir(uploadDir, 0777)
+	pendingDir := fmt.Sprintf("%s/%s", svc.UploadDir, "pending")
+	uploadDir := fmt.Sprintf("%s/%s", pendingDir, uploadID)
+	os.MkdirAll(uploadDir, 0777)
 
 	// when chunking is being used, there will be additional form params:
 	// dzchunkindex,  dztotalfilesize, dzchunksize,  dztotalchunkcount
@@ -51,6 +56,7 @@ func (svc *ServiceContext) UploadFile(c *gin.Context) {
 		}
 		defer outFile.Close()
 		_, err = io.Copy(outFile, file)
+		os.Chmod(dest, 0777)
 	} else {
 		// not chunked; just save the file in the temp dir
 		file, err := c.FormFile("file")
@@ -69,6 +75,7 @@ func (svc *ServiceContext) UploadFile(c *gin.Context) {
 			c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
 			return
 		}
+		os.Chmod(dest, 0777)
 		log.Printf("Done receiving %s", filename)
 		c.String(http.StatusOK, "Submitted")
 	}
@@ -78,7 +85,7 @@ func (svc *ServiceContext) UploadFile(c *gin.Context) {
 func (svc *ServiceContext) DeleteUploadedFile(c *gin.Context) {
 	tgtFile := c.Param("file")
 	uploadID := c.Query("key")
-	tgt := fmt.Sprintf("%s/%s/%s", svc.UploadDir, uploadID, tgtFile)
+	tgt := fmt.Sprintf("%s/%s/%s/%s", svc.UploadDir, "pending", uploadID, tgtFile)
 	log.Printf("Request to delete %s", tgt)
 	if _, err := os.Stat(tgt); err == nil {
 		delErr := os.Remove(tgt)
