@@ -121,6 +121,7 @@ CREATE TABLE accessions (
    activities text DEFAULT NULL,
    creator text DEFAULT NULL,
    accession_type varchar(25), 
+   created_at datetime default CURRENT_TIMESTAMP,
    unique index(identifier),
    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -45,7 +45,7 @@ const state = {
     dateRange: '',
     boxInfo: '',
     selectedTypes: [],
-    transferMethod: 0,
+    transferMethod: "1",
     hasDigital: '1',
     techInfo: '',
     mediaCarriers: [],

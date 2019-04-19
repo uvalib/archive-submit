@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	dbx "github.com/go-ozzo/ozzo-dbx"
 )
 
 // ControlledVocab contains the data common to controlled vocabulary tables
@@ -12,6 +15,21 @@ type ControlledVocab struct {
 	Name        string `json:"name"`
 	Description string `json:"description,omitempty"`
 	Digital     bool   `json:"digitalOnly,omitempty" db:"digital"`
+}
+
+// GetVocabNamesCSV will convert a list og string identifiers into a comma separated list of
+// controlled value names
+func GetVocabNamesCSV(db *dbx.DB, table string, ids []string) string {
+	qs := fmt.Sprintf("select name from %s where id in (%s)", table, strings.Join(ids, ","))
+	q := db.NewQuery(qs)
+	var out []string
+	rows, _ := q.Rows()
+	for rows.Next() {
+		var val string
+		rows.Scan(&val)
+		out = append(out, val)
+	}
+	return strings.Join(out, ", ")
 }
 
 // GetGenres returns a list of genres as JSON

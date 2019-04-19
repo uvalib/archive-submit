@@ -57,11 +57,42 @@ func (user *User) FullName() string {
 }
 
 // SendReceiptEmail will send the user (and admins) a transfer receipt email
-func (user *User) SendReceiptEmail(smtpCfg SMTPConfig, accession Accession, bcc []string) {
+func (user *User) SendReceiptEmail(db *dbx.DB, smtpCfg SMTPConfig, accession Accession) {
+	log.Printf("Get BCC users for receipt")
+	var bcc []string
+	q := db.NewQuery(`select email from users where admin=1`)
+	rows, _ := q.Rows()
+	for rows.Next() {
+		var email string
+		rows.Scan(&email)
+		bcc = append(bcc, email)
+	}
+
+	type Data struct {
+		*Accession
+		Genres              string
+		DigitalRecordTypes  string
+		PhysicalRecordTypes string
+		DigitalSizeGB       string
+		DigitalFiles        string
+	}
+
+	data := Data{Accession: &accession}
+	data.Genres = GetVocabNamesCSV(db, "genres", accession.GenreIDs)
+	if accession.DigitalTransfer {
+		data.DigitalRecordTypes = GetVocabNamesCSV(db, "record_types", accession.Digital.RecordTypeIDs)
+		sizeGB := float32(accession.Digital.TotalSize) / 1000.0 / 1000.0
+		data.DigitalSizeGB = fmt.Sprintf("%.2fGB", sizeGB)
+		data.DigitalFiles = strings.Join(accession.Digital.Files, ", ")
+	}
+	if accession.PhysicalTransfer {
+		data.PhysicalRecordTypes = GetVocabNamesCSV(db, "record_types", accession.Physical.RecordTypeIDs)
+	}
+
 	log.Printf("Rendering receipt email body")
 	var renderedEmail bytes.Buffer
 	tpl := template.Must(template.ParseFiles("templates/receipt_email.html"))
-	err := tpl.Execute(&renderedEmail, accession)
+	err := tpl.Execute(&renderedEmail, data)
 	if err != nil {
 		log.Printf("ERROR: Unable to render receipt email: %s", err.Error())
 		return

@@ -8,8 +8,31 @@
          This email is a receipt for your recent submission using the University of Virgina Archives Records Transfer Form.
          <br/>Transfer Details:
       </p>
-      <ul>
-         <li><b>Transfer Identifier:</b></li>
-      </ul>
+      <div>
+         <h3>General Information</h3>
+         <p><b>Transfer Identifier:</b><br/>{{.Identifier}}</p>
+         <p><b>Transfer Date/Time:</b><br/>{{.CreatedAt}}</p>
+         <p><b>Acession Type:</b><br/>{{.Type}}</p>
+         <p><b>Summary:</b><br/>{{.Summary}}</p>
+         <p><b>Activities leading to creation:</b><br/>{{.Activities}}</p>
+         <p><b>Creator:</b><br/>{{.Creator}}</p>
+         <p><b>Genres:</b><br/>{{.Genres}}</p>
+      </div> 
+      {{- if .DigitalTransfer}}    
+      <div>
+         <h3>Digital Transfer</h3>
+         <p><b>Technical Description:</b><br/>{{.Digital.Description}}</p>
+         <p><b>Date Range of Files:</b><br/>{{.Digital.DateRange}}</p>
+         <p><b>Record Types:</b><br/>{{.DigitalRecordTypes}}</p>
+         <p><b>Total Transfer Size:</b><br/>{{.DigitalSizeGB}}GB</p>
+         <p><b>Files:</b><br/>{{.DigitalFiles}}</p>
+      </div>
+      {{- end}}
+      {{- if .PhysicalTransfer}}    
+      <div>
+         <h3>Physical Transfer</h3>
+         <p><b>Record Types:</b><br/>{{.PhysicalRecordTypes}}</p>
+      </div>
+      {{- end}}
    </body>
 </html>

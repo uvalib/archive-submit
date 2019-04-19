@@ -79,6 +79,7 @@ type Accession struct {
 	Creator          string            `json:"creator" db:"creator"`
 	GenreIDs         []string          `json:"selectedGenres" db:"-"`
 	Type             string            `json:"accessionType" db:"accession_type"`
+	CreatedAt        time.Time         `json:"createdAt" db:"created_at"`
 	DigitalTransfer  bool              `json:"digitalTransfer" db:"-"`
 	Digital          DigitalAccession  `json:"digital" db:"-"`
 	PhysicalTransfer bool              `json:"physicalTransfer" db:"-"`
@@ -130,12 +131,12 @@ func (a *Accession) WriteDigitalTransfer(tx *dbx.Tx) error {
 	for _, IDStr := range a.Digital.RecordTypeIDs {
 		ID, _ := strconv.Atoi(IDStr)
 		_, err := tx.Insert("accession_record_types", dbx.Params{
-			"accession_id":   a.ID,
+			"accession_id":   a.Digital.ID,
 			"accession_type": "digital",
 			"record_type_id": ID,
 		}).Execute()
 		if err != nil {
-			log.Printf("WARN: Unable to attach record type %d to accession %d", ID, a.ID)
+			log.Printf("WARN: Unable to attach record type %d to accession %d", ID, a.Digital.ID)
 		}
 	}
 	return nil
@@ -166,12 +167,12 @@ func (a *Accession) WritePhysicalTransfer(tx *dbx.Tx) error {
 	for _, IDStr := range a.Physical.RecordTypeIDs {
 		ID, _ := strconv.Atoi(IDStr)
 		_, err := tx.Insert("accession_record_types", dbx.Params{
-			"accession_id":   a.ID,
+			"accession_id":   a.Physical.ID,
 			"accession_type": "physical",
 			"record_type_id": ID,
 		}).Execute()
 		if err != nil {
-			log.Printf("WARN: Unable to attach record type %d to accession %d", ID, a.ID)
+			log.Printf("WARN: Unable to attach record type %d to accession %d", ID, a.Physical.ID)
 		}
 	}
 
@@ -210,6 +211,7 @@ func (svc *ServiceContext) Submit(c *gin.Context) {
 	log.Printf("Add new accession record")
 	tx, _ := svc.DB.Begin()
 	accession.UserID = accession.User.ID
+	accession.CreatedAt = time.Now()
 	err = tx.Model(&accession).Insert()
 	if err != nil {
 		log.Printf("ERROR: Unable to add accession %s", err.Error())
@@ -252,15 +254,7 @@ func (svc *ServiceContext) Submit(c *gin.Context) {
 	tx.Commit()
 
 	// Now send recepit to submitter and admins
-	q := svc.DB.NewQuery(`select email from users where admin=1`)
-	var emails []string
-	rows, _ := q.Rows()
-	for rows.Next() {
-		var email string
-		rows.Scan(&email)
-		emails = append(emails, email)
-	}
-	accession.User.SendReceiptEmail(svc.SMTP, accession, emails)
+	accession.User.SendReceiptEmail(svc.DB, svc.SMTP, accession)
 	c.String(http.StatusOK, "accepted")
 }
 
