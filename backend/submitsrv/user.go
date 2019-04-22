@@ -70,11 +70,13 @@ func (user *User) SendReceiptEmail(db *dbx.DB, smtpCfg SMTPConfig, accession Acc
 
 	type Data struct {
 		*Accession
-		Genres              string
-		DigitalRecordTypes  string
-		PhysicalRecordTypes string
-		DigitalSizeGB       string
-		DigitalFiles        string
+		Genres                 string
+		DigitalRecordTypes     string
+		PhysicalRecordTypes    string
+		DigitalSizeGB          string
+		DigitalFiles           string
+		PhysicalTransferMethod string
+		MediaCarriers          string
 	}
 
 	data := Data{Accession: &accession}
@@ -84,6 +86,8 @@ func (user *User) SendReceiptEmail(db *dbx.DB, smtpCfg SMTPConfig, accession Acc
 		sizeGB := float32(accession.Digital.TotalSize) / 1000.0 / 1000.0
 		data.DigitalSizeGB = fmt.Sprintf("%.2fGB", sizeGB)
 		data.DigitalFiles = strings.Join(accession.Digital.Files, ", ")
+		data.PhysicalTransferMethod = GetVocabName(db, "transfer_methods", data.Physical.TransferMethodID)
+		data.MediaCarriers = GetVocabNamesCSV(db, "media_carriers", accession.Physical.MediaCarrierIDs)
 	}
 	if accession.PhysicalTransfer {
 		data.PhysicalRecordTypes = GetVocabNamesCSV(db, "record_types", accession.Physical.RecordTypeIDs)

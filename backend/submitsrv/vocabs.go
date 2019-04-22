@@ -32,6 +32,15 @@ func GetVocabNamesCSV(db *dbx.DB, table string, ids []string) string {
 	return strings.Join(out, ", ")
 }
 
+// GetVocabName will get the text name for the controlled vocabulary ID
+func GetVocabName(db *dbx.DB, table string, id int) string {
+	qs := fmt.Sprintf("select name from %s where id = %d", table, id)
+	q := db.NewQuery(qs)
+	var out struct{ Name string }
+	q.One(&out)
+	return out.Name
+}
+
 // GetGenres returns a list of genres as JSON
 func (svc *ServiceContext) GetGenres(c *gin.Context) {
 	q := svc.DB.NewQuery("SELECT id, name FROM genres")

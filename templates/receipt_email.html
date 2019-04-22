@@ -14,7 +14,7 @@
          <p><b>Transfer Date/Time:</b><br/>{{.CreatedAt}}</p>
          <p><b>Acession Type:</b><br/>{{.Type}}</p>
          <p><b>Summary:</b><br/>{{.Summary}}</p>
-         <p><b>Activities leading to creation:</b><br/>{{.Activities}}</p>
+         <p><b>Activities Leading to Creation:</b><br/>{{.Activities}}</p>
          <p><b>Creator:</b><br/>{{.Creator}}</p>
          <p><b>Genres:</b><br/>{{.Genres}}</p>
       </div> 
@@ -31,7 +31,38 @@
       {{- if .PhysicalTransfer}}    
       <div>
          <h3>Physical Transfer</h3>
+         <p><b>Date Range of Records:</b><br/>{{.Physical.DateRange}}</p>
+         <p><b>Number and Size of Boxes:</b><br/>{{.Physical.BoxInfo}}</p>
          <p><b>Record Types:</b><br/>{{.PhysicalRecordTypes}}</p>
+         <p><b>Transfer Method:</b><br/>{{.PhysicalTransferMethod}}</p>
+         <p><b>Does Transfer Include Digital Media Carriers:</b>
+            <br/>{{- if .Physical.HasDigital}}Yes{{- else}}No{{- end}}
+         </p>
+         {{- if .Physical.HasDigital}}
+         <p><b>Technical Description:</b><br/>{{.Physical.TechInfo}}</p>
+         <p><b>Media Carriers:</b><br/>{{.MediaCarriers}}</p>
+         <p><b>Media Carrier Estimates:</b><br/>{{.Physical.MediaCount}}</p>
+         <p><b>Does Transfer Include Software:</b>
+            <br/>{{- if .Physical.HasSoftware}}Yes{{- else}}No{{- end}}
+         </p>
+         {{ end}}
+      </div>
+      <div>
+         <h3>Physical Inventory</h3>
+         <table>
+            <tr>
+               <th>Box Number</th><th>Record Group #</th><th>Box Title</th><th>Description</th><th>Dates</th>
+            </tr>
+            {{- range $index, $item := .Physical.Inventory -}}
+            <tr>
+               <td>{{.BoxNumber}}</td>
+               <td>{{.RecordGroup}}</td>
+               <td>{{.Title}}</td>
+               <td>{{.Description}}</td>
+               <td>{{.Dates}}</td>
+            </tr>
+            {{- end}}
+         </table>
       </div>
       {{- end}}
    </body>
