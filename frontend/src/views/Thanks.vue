@@ -1,5 +1,5 @@
 <template>
-   <div class="forbidden">
+   <div class="thanks content">
       <h2>University Archives Records Transfer Form</h2>
       <div>
          <h3>Thank you!</h3>
@@ -26,9 +26,4 @@ export default {
 </script>
 
 <style scoped>
-div.forbidden {
-   padding: 15px 25px;
-   min-height: 600px;
-   background: white;
-}
 </style>

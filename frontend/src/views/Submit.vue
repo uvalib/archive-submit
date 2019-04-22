@@ -1,5 +1,5 @@
 <template>
-  <div class="submit">
+  <div class="submit content">
     <h2>University Archives Records Transfer Form</h2>
     <div class="contact-small">
       <p>University Archives</p>
@@ -136,17 +136,5 @@ div.contact-small {
 div.contact-small p {
   margin: 0;
 }
-div.submit {
-  padding: 30px 50px 250px 50px;
-  height: 100%;
-  background: white;
-  min-width: 1000px;
-  width: 75%;
-  margin: 0 auto;
-  border-right: 1px solid #dfdacc;
-  border-left: 1px solid #dfdacc;
-  font-weight: 400;
-  font-size: 0.9em;
-  color: #666;
-}
+
 </style>

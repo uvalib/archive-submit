@@ -1,5 +1,5 @@
 <template>
-   <div class="verify">
+   <div class="verify content">
       <h2>University Archives Records Transfer Form</h2>
       <template v-if="state === 'verify'">
           <h3>Verifying</h3>
@@ -56,19 +56,6 @@ export default {
 </script>
 
 <style scoped>
-div.verify {
-   position: relative;
-   min-width: 1000px;
-   padding: 30px 50px 250px 50px;
-   min-height: 600px;
-   background: white;
-   width: 75%;
-   margin: 0 auto;
-   border-right: 1px solid #dfdacc;
-   border-left: 1px solid #dfdacc;
-   font-weight: 400;
-   color: #444;
-}
 .error-message {
    width: 100%;
    text-align: center;
