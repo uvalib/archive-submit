@@ -82,6 +82,14 @@ export default {
       json.digitalTransfer = this.digitalTransfer
       json.physicalTransfer = this.physicalTransfer
       if (this.digitalTransfer) {
+        if (this.digital.uploadedFiles.length === 0) {
+          this.$store.commit("setError", "You must upload at least one digital file") 
+          return
+        }
+        if (this.digital.description.length === 0) {
+          this.$store.commit("setError", "Please provide a technical description for the digital transfer") 
+          return
+        }
         json.digital = this.digital
       }
       if (this.physicalTransfer) { 
@@ -93,11 +101,24 @@ export default {
         json.physical.transferMethod = parseInt(json.physical.transferMethod, 10)
         json.physical.hasDigital = (json.physical.hasDigital === "1")
         json.physical.hasSoftware = (json.physical.hasSoftware === "1")
+        if (this.physical.boxInfo.length === 0) {
+            this.$store.commit("setError", "Please provide some details about the quantity and size of the boxes being transferred") 
+            return
+        }
+        if (this.physical.inventory.length === 0) {
+            this.$store.commit("setError", "Please provide an inventory of the records being transferred") 
+            return
+        }
         if ( !json.physical.hasDigital) {
           delete json.physical.techInfo 
           delete json.physical.mediaCarriers 
           delete json.physical.mediaCount 
           delete json.physical.hasSoftware 
+        } else {
+          if (this.physical.techInfo.length === 0) {
+            this.$store.commit("setError", "Please provide a technical description for the digital records") 
+            return
+          }
         }
       }
       // console.log(json)

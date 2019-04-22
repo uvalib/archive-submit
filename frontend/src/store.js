@@ -170,6 +170,10 @@ const mutations = {
       }
     });
   },
+  clearRecordTypes(state) {
+    state.digitalRecordTypes = []
+    state.physicalRecordTypes = []
+  }
 }
 
 // Actions are asynchronous calls that commit mutatations to the state.
@@ -202,7 +206,7 @@ const actions = {
     })
   },
   getRecordTypes( ctx ) {
-    ctx.commit('setRecordTypes', []) 
+    ctx.commit('clearRecordTypes', []) 
     axios.get("/api/types").then((response)  =>  {
       ctx.commit('setRecordTypes', response.data )
     }).catch(() => {
