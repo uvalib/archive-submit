@@ -97,9 +97,11 @@ CREATE TABLE users (
    verified boolean default FALSE,
    verify_token varchar(25), 
    admin boolean default FALSE,
+   api_token varchar(25) NOT NULL DEFAULT "",
    created_at datetime NOT NULL,
    updated_at datetime NOT NULL,
    INDEX (verify_token),
+   INDEX (api_token),
    UNIQUE KEY (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

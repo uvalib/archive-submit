@@ -258,9 +258,9 @@ func (svc *ServiceContext) Submit(c *gin.Context) {
 	c.String(http.StatusOK, "accepted")
 }
 
-// GetSubmissionIdentifier will generate an unique token to identify digital content uploads
+// GetAccessionIdentifier will generate an unique token to identify digital content uploads
 // It will be used as a storage subdir for files as they are uploaded
-func (svc *ServiceContext) GetSubmissionIdentifier(c *gin.Context) {
+func (svc *ServiceContext) GetAccessionIdentifier(c *gin.Context) {
 	id := xid.New()
 	c.String(http.StatusOK, id.String())
 }

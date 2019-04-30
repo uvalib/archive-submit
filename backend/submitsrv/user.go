@@ -28,6 +28,7 @@ type User struct {
 	Verified    bool      `json:"verified"`
 	VerifyToken string    `json:"token"  db:"verify_token" `
 	Admin       bool      `json:"-"`
+	APIToken    string    `json:"-"  db:"api_token" `
 	CreatedAt   time.Time `db:"created_at" json:"-"`
 	UpdatedAt   time.Time `db:"updated_at" json:"-"`
 }
@@ -174,6 +175,13 @@ func (user *User) FindByEmail(db *dbx.DB, email string) error {
 // FindByToken finds a user by verfy_token
 func (user *User) FindByToken(db *dbx.DB, token string) error {
 	q := db.NewQuery(`select * from users where verify_token={:token} limit 1`)
+	q.Bind(dbx.Params{"token": token})
+	return q.One(user)
+}
+
+// FindByAPIToken finds a user by the API Token
+func (user *User) FindByAPIToken(db *dbx.DB, token string) error {
+	q := db.NewQuery(`select * from users where api_token={:token} limit 1`)
 	q.Bind(dbx.Params{"token": token})
 	return q.One(user)
 }
