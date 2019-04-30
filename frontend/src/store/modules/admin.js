@@ -1,11 +1,17 @@
 import axios from 'axios'
 
 const admin = {
+   namespaced: true,
    state: {
       accessions: [],
       totalAccessions: 0,
       page: 0,
       pageSize: 0
+   },
+   getters: {
+      loginName (_state, _getters, rootState) {
+         return rootState.user.firstName + " ("+rootState.user.email+")"
+      }
    },
    mutations: {
       setAccessions (state, accessionsInfo) {
@@ -23,7 +29,7 @@ const admin = {
       },
    },
    actions: {
-      getGenres( ctx ) {
+      getAccessions( ctx ) {
          ctx.commit('clearAccessions')
          axios.get("/api/admin/accessions").then((response)  =>  {
             ctx.commit('setAccessions', response.data )

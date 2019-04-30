@@ -44,9 +44,9 @@ func (svc *ServiceContext) Authenticate(c *gin.Context) {
 	json, _ := json.Marshal(user)
 
 	if tgtRoute != "submit" {
-		log.Printf("Adding access token to user")
+		log.Printf("Adding API Access token to user")
 		user.APIToken = xid.New().String()
-		svc.DB.Model(&user).Update("Token")
+		svc.DB.Model(&user).Update("APIToken")
 
 		// place the access token in a secure, http-only cookie that the browser can't touch.
 		// it will just be passed along on all admin api requests
