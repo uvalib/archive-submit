@@ -20,7 +20,12 @@ type ControlledVocab struct {
 // GetVocabNamesCSV will convert a list og string identifiers into a comma separated list of
 // controlled value names
 func GetVocabNamesCSV(db *dbx.DB, table string, ids []string) string {
-	qs := fmt.Sprintf("select name from %s where id in (%s)", table, strings.Join(ids, ","))
+	IDs := strings.Join(ids, ",")
+	if IDs == "" {
+		// not IDs present, return a blank string
+		return ""
+	}
+	qs := fmt.Sprintf("select name from %s where id in (%s)", table, IDs)
 	q := db.NewQuery(qs)
 	var out []string
 	rows, _ := q.Rows()

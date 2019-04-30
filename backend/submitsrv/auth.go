@@ -30,6 +30,7 @@ func (svc *ServiceContext) Authenticate(c *gin.Context) {
 	}
 
 	email := fmt.Sprintf("%s@virginia.edu", computingID)
+	log.Printf("Authenticate %s", email)
 	user := User{}
 	err := user.FindByEmail(svc.DB, email)
 	if err != nil {
@@ -38,7 +39,7 @@ func (svc *ServiceContext) Authenticate(c *gin.Context) {
 		return
 	}
 
-	tgtRoute := c.Param("page")
+	tgtRoute := c.Query("page")
 	log.Printf("Authentication successful for %s", computingID)
 	json, _ := json.Marshal(user)
 

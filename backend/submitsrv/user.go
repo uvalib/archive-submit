@@ -26,8 +26,8 @@ type User struct {
 	Email       string    `json:"email" binding:"required" form:"email"`
 	Phone       string    `json:"phone" binding:"required" form:"phone"`
 	Verified    bool      `json:"verified"`
-	VerifyToken string    `json:"token"  db:"verify_token" `
-	Admin       bool      `json:"-"`
+	VerifyToken *string   `json:"token"  db:"verify_token"`
+	Admin       bool      `json:"admin"`
 	APIToken    string    `json:"-"  db:"api_token" `
 	CreatedAt   time.Time `db:"created_at" json:"-"`
 	UpdatedAt   time.Time `db:"updated_at" json:"-"`
@@ -87,11 +87,11 @@ func (user *User) SendReceiptEmail(db *dbx.DB, smtpCfg SMTPConfig, accession Acc
 		sizeGB := float32(accession.Digital.TotalSize) / 1000.0 / 1000.0
 		data.DigitalSizeGB = fmt.Sprintf("%.2fGB", sizeGB)
 		data.DigitalFiles = strings.Join(accession.Digital.Files, ", ")
-		data.PhysicalTransferMethod = GetVocabName(db, "transfer_methods", data.Physical.TransferMethodID)
-		data.MediaCarriers = GetVocabNamesCSV(db, "media_carriers", accession.Physical.MediaCarrierIDs)
 	}
 	if accession.PhysicalTransfer {
 		data.PhysicalRecordTypes = GetVocabNamesCSV(db, "record_types", accession.Physical.RecordTypeIDs)
+		data.PhysicalTransferMethod = GetVocabName(db, "transfer_methods", data.Physical.TransferMethodID)
+		data.MediaCarriers = GetVocabNamesCSV(db, "media_carriers", accession.Physical.MediaCarrierIDs)
 	}
 
 	log.Printf("Rendering receipt email body")
@@ -135,7 +135,7 @@ func (user *User) SendVerifyEmail(baseURL string, smtpCfg SMTPConfig) {
 		URL  string
 	}
 	data.Name = user.FullName()
-	data.URL = fmt.Sprintf("https://%s/verify/%s", baseURL, user.VerifyToken)
+	data.URL = fmt.Sprintf("https://%s/verify/%s", baseURL, *user.VerifyToken)
 	tpl := template.Must(template.ParseFiles("templates/verify_email.html"))
 	err := tpl.Execute(&renderedEmail, data)
 	if err != nil {
@@ -230,7 +230,9 @@ func (svc *ServiceContext) CreateUser(c *gin.Context) {
 		c.String(http.StatusBadRequest, "All fields are required")
 		return
 	}
-	user.VerifyToken = xid.New().String()
+
+	token := xid.New().String()
+	user.VerifyToken = &token
 	err := user.Create(svc.DB)
 	if err != nil {
 		log.Printf("ERROR: User create failed: %s", err.Error())

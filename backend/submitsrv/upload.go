@@ -25,7 +25,7 @@ func (svc *ServiceContext) UploadFile(c *gin.Context) {
 	// uploaded files are pending until a transfer submission is receved.
 	// at that point, they will be moved to a final transfer directory. all files
 	// in pending can me considered temporary and be purged.
-	log.Printf("Identifier received. Create upload directory.")
+	log.Printf("Identifier %s received. Create upload directory.", uploadID)
 	pendingDir := fmt.Sprintf("%s/%s", svc.UploadDir, "pending")
 	uploadDir := fmt.Sprintf("%s/%s", pendingDir, uploadID)
 	os.MkdirAll(uploadDir, 0777)
@@ -42,8 +42,8 @@ func (svc *ServiceContext) UploadFile(c *gin.Context) {
 			return
 		}
 		filename := header.Filename
-		log.Printf("Received CHUNKED request to upload %s, chunk %s size %s", filename, chunkIdx, c.PostForm("dzchunksize"))
 		dest := fmt.Sprintf("%s/%s", uploadDir, filename)
+		log.Printf("Received CHUNKED request to upload %s, chunk %s size %s", dest, chunkIdx, c.PostForm("dzchunksize"))
 		if chunkIdx == "0" {
 			if _, err := os.Stat(dest); err == nil {
 				log.Printf("WARN: File %s already exists; removing", dest)
@@ -76,7 +76,7 @@ func (svc *ServiceContext) UploadFile(c *gin.Context) {
 			return
 		}
 		os.Chmod(dest, 0777)
-		log.Printf("Done receiving %s", filename)
+		log.Printf("Done receiving %s", dest)
 		c.String(http.StatusOK, "Submitted")
 	}
 }
