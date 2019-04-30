@@ -10,6 +10,9 @@ const admin = {
    },
    getters: {
       loginName (_state, _getters, rootState) {
+         if (rootState.user == null) {
+            return ""
+         }
          return rootState.user.firstName + " ("+rootState.user.email+")"
       }
    },
@@ -18,7 +21,7 @@ const admin = {
          state.totalAccessions = accessionsInfo.total 
          state.page = accessionsInfo.page
          state.pageSize = accessionsInfo.pageSize
-         accessionsInfo.thumbs.forEach( function(acc) {
+         accessionsInfo.accessions.forEach( function(acc) {
             state.accessions.push(acc)
          })
       },
