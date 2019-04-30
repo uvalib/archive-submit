@@ -48,18 +48,19 @@
 
 <script>
 import { mapFields } from 'vuex-map-fields'
+import { mapState } from 'vuex'
 export default {
    computed: {
-      genres: function() {
-         return this.$store.state.genres;
-      },
       ...mapFields([
-         'accession.summary',
-         'accession.activities',
-         'accession.creator',
-         'accession.selectedGenres',
-         'accession.accessionType',
-      ])
+         'transfer.accession.summary',
+         'transfer.accession.activities',
+         'transfer.accession.creator',
+         'transfer.accession.selectedGenres',
+         'transfer.accession.accessionType',
+      ]),
+      ...mapState({
+         genres: state => state.transfer.genres,
+      })
    }
 };
 </script>

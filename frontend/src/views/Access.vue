@@ -10,11 +10,7 @@
          <div class="email-entry pure-form">
             <label>Email Address</label>
             <input type="email" id="email" placeholder="Email">
-            <button
-               @click="checkEmail"
-               type="submit"
-               class="pure-button pure-button-primary"
-            >Continue</button>
+            <button  @click="checkEmail" class="pure-button pure-button-primary">Continue</button>
          </div>
       </template>
       <template v-else-if="state === 'unverified'">

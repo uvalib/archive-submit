@@ -3,9 +3,7 @@
       <h2>
          <span>University Archives Records Transfer Form</span>
          <span class="admin">
-            <router-link to="/admin">
-               <button class="pure-button pure-button-primary">Admin Access</button>
-            </router-link>
+            <button @click="adminClicked" class="pure-button pure-button-primary">Admin Access</button>
          </span>
       </h2>
       <div class="contact">
@@ -40,16 +38,14 @@
          </p>
          <ul>
             <li>
-               <a
-                  href="https://uvapolicy.virginia.edu/policy/IRM-012"
-                  target="_blank"
-               >IRM-012: Privacy and Confidentiality of University Information</a>
+               <a href="https://uvapolicy.virginia.edu/policy/IRM-012" target="_blank">
+                  IRM-012: Privacy and Confidentiality of University Information
+               </a>
             </li>
             <li>
-               <a
-                  href="https://uvapolicy.virginia.edu/policy/IRM-003"
-                  target="_blank"
-               >IRM-003: Data Protection of University Information</a>
+               <a href="https://uvapolicy.virginia.edu/policy/IRM-003" target="_blank">
+                  IRM-003: Data Protection of University Information
+               </a>
             </li>
          </ul>
          <p>Contact the University Archivist in advance to discuss records containing PII prior to arranging transfer.</p>
@@ -98,6 +94,13 @@ export default {
       })
    },
    methods: {
+      adminClicked: function() {
+         // redirect to the authenticate endpoint (not vue) which is
+         // behind NetBadge. If successful, an API token will be generated and
+         // stored in an http-only, secure cookie. User will 
+         // be redirected to the admin page
+         window.location.href = "/authenticate?page=admin"
+      },
       uvaStatusClick: function(status) {
          this.$store.commit("setUVA", status)
       },
@@ -108,8 +111,8 @@ export default {
             this.$store.commit("setError", "Please select at least one type of record to transfer")
             return
          }
-         this.$store.commit("setPhysicalTransfer", physical)
-         this.$store.commit("setDigitalTransfer", digital)
+         this.$store.commit("transfer/setPhysicalTransfer", physical)
+         this.$store.commit("transfer/setDigitalTransfer", digital)
          this.$store.commit("clearUser")
          if (this.$store.state.isUVA == false) {
             this.$router.push("access")
@@ -118,7 +121,7 @@ export default {
             // state held in vuex. Need to persist key bits in a cookie 
             // for retrieval after the auth redirects happen
             this.$cookies.set("archives_xfer_settings", {physical: physical, digital: digital})
-            window.location.href = "/authenticate"
+            window.location.href = "/authenticate?page=submit"
          }
       }
    }

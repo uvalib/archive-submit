@@ -80,6 +80,6 @@ h4 .accordion-icon {
    right: 5px;
    cursor: pointer;
    transform: rotate(0deg);
-   transition-duration: 0.7s;
+   transition-duration: 0.4s;
 }
 </style>

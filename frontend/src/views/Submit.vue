@@ -45,11 +45,11 @@ export default {
        ...mapState({
          error: state => state.error,
          user: state => state.user,
-         accession: state => state.accession,
-         digital: state => state.digital,
-         physical: state => state.physical,
-         digitalTransfer: state => state.digitalTransfer,
-         physicalTransfer: state => state.physicalTransfer,
+         accession: state => state.transfer.accession,
+         digital: state => state.transfer.digital,
+         physical: state => state.transfer.physical,
+         digitalTransfer: state => state.transfer.digitalTransfer,
+         physicalTransfer: state => state.transfer.physicalTransfer,
       }),
   },
   created: function () {
@@ -60,8 +60,8 @@ export default {
     if (authUser) {
       let settings = this.$cookies.get("archives_xfer_settings")
       this.$store.commit("setUVA", true)
-      this.$store.commit("setPhysicalTransfer", settings.physical)
-      this.$store.commit("setDigitalTransfer", settings.digital)
+      this.$store.commit("transfer/setPhysicalTransfer", settings.physical)
+      this.$store.commit("transfer/setDigitalTransfer", settings.digital)
       this.$store.commit("setUser",authUser)
       this.$cookies.remove("archives_xfer_user")
       this.$cookies.remove("archives_xfer_settings")
@@ -70,9 +70,9 @@ export default {
         this.$router.push("/")
       }
     }
-    this.$store.dispatch('getGenres')
-    this.$store.dispatch('getRecordTypes')
-    this.$store.dispatch('getSubmissionID')
+    this.$store.dispatch('transfer/getGenres')
+    this.$store.dispatch('transfer/getRecordTypes')
+    this.$store.dispatch('transfer/getSubmissionID')
   },
   methods: {
     submitClicked() {
@@ -123,7 +123,7 @@ export default {
       }
       // console.log(json)
       axios.post("/api/submit", json).then((/*response*/)  =>  {
-        this.$store.commit("clearSubmissionData") 
+        this.$store.commit("transfer/clearSubmissionData") 
         this.$router.push("thanks")
       }).catch((error) => {
         this.$store.commit("setError",error.response.data) 

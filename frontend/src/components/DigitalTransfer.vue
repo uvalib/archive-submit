@@ -34,7 +34,7 @@
             </div>
          </vue-dropzone>
          <div class="total-size">
-            <span><b>Total Upload Size: </b></span><span>{{uploadSize}}</span>
+            <span><b>Total Upload Size: </b></span><span>{{digitalUploadSize}}</span>
          </div>
       </div>
    </AccordionContent>
@@ -45,6 +45,7 @@ import AccordionContent from '@/components/AccordionContent'
 import vue2Dropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 import { mapFields } from 'vuex-map-fields'
+import { mapGetters } from 'vuex'
 
 export default {
    components: {
@@ -60,7 +61,7 @@ export default {
             maxFilesize: null,
             chunking: true,
             chunkSize: 10000000, // bytes = 10Mb,
-             addRemoveLinks: true 
+            addRemoveLinks: true 
          }
       }
    },
@@ -68,31 +69,30 @@ export default {
       this.destroyStarted = true
    },
    computed: {
-      digitalRecordTypes() {
-         return this.$store.state.digitalRecordTypes
-      },
-      uploadSize() {
-         return this.$store.getters.digitalUploadSize
-      },
       ...mapFields([
-         'digital.uploadedFiles',
-         'digital.summary',
-         'digital.description',
-         'digital.dateRange',
-         'digital.selectedTypes',
-      ])
+         'transfer.digital.uploadedFiles',
+         'transfer.digital.summary',
+         'transfer.digital.description',
+         'transfer.digital.dateRange',
+         'transfer.digital.selectedTypes',
+         'transfer.digitalRecordTypes',
+      ]),
+      ...mapGetters({
+         digitalUploadSize: 'transfer/digitalUploadSize',
+         submissionID: 'transfer/submissionID',
+      })
    },
    methods: {
       fileAddedEvent (file) {
-         this.$store.commit("addUploadedFile",file)
+         this.$store.commit("transfer/addUploadedFile",file)
       },
       fileRemovedEvent (file) {
          if (this.destroyStarted === false ) {
-            this.$store.dispatch("removeUploadedFile",file)
+            this.$store.dispatch("transfer/removeUploadedFile",file)
          }
       },
       sendingEvent (file, xhr, formData) {
-         formData.append('identifier', this.$store.getters.submissionID);
+         formData.append('identifier', this.submissionID);
       },
   }
 }

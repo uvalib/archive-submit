@@ -101,6 +101,7 @@
                   <span @click="inventoryClicked" class="inventory pure-button pure-button-primary">
                      Inventory Form
                   </span>
+                  <span class="note">Inventory Size: {{inventoryCount}}</span>
                </div>
             </div>
          </div>
@@ -114,6 +115,7 @@ import AccordionContent from "@/components/AccordionContent"
 import InventoryForm from "@/components/InventoryForm"
 import { mapFields } from 'vuex-map-fields'
 import { mapState } from "vuex"
+import { mapGetters } from 'vuex'
 
 export default {
    components: {
@@ -124,7 +126,7 @@ export default {
       hasDigital: function (val) {
          let eles = document.getElementsByClassName("digital-info")
          if (val === "0") {
-            this.$store.commit("clearPhysicalXefrDigitalInfo")
+            this.$store.commit("transfer/clearPhysicalXefrDigitalInfo")
          } 
          Array.from(eles).forEach( function(ele) {
             ele.readOnly = (val === "0")
@@ -139,30 +141,33 @@ export default {
    },
    computed: {
       ...mapState({
-         mediaCarrierChoices: state => state.mediaCarrierChoices,
-         transferMethods: state => state.transferMethods,
-         physicalRecordTypes: state => state.physicalRecordTypes,
-         showInventory: state => state.showInventory,
+         mediaCarrierChoices: state => state.transfer.mediaCarrierChoices,
+         transferMethods: state => state.transfer.transferMethods,
+         physicalRecordTypes: state => state.transfer.physicalRecordTypes,
+         showInventory: state => state.transfer.showInventory,
       }),
       ...mapFields([
-         'physical.dateRange',
-         'physical.boxInfo',
-         'physical.selectedTypes',
-         'physical.transferMethod',
-         'physical.hasDigital',
-         'physical.techInfo',
-         'physical.mediaCarriers',
-         'physical.mediaCount',
-         'physical.hasSoftware',
-      ])
+         'transfer.physical.dateRange',
+         'transfer.physical.boxInfo',
+         'transfer.physical.selectedTypes',
+         'transfer.physical.transferMethod',
+         'transfer.physical.hasDigital',
+         'transfer.physical.techInfo',
+         'transfer.physical.mediaCarriers',
+         'transfer.physical.mediaCount',
+         'transfer.physical.hasSoftware',
+      ]),
+      ...mapGetters({
+         inventoryCount: 'transfer/inventoryCount',
+      })
    },
    created: function() {
-      this.$store.dispatch("getTransferMethods")
-      this.$store.dispatch("getMediaCarriers")
+      this.$store.dispatch("transfer/getTransferMethods")
+      this.$store.dispatch("transfer/getMediaCarriers")
    },
    methods: {
       inventoryClicked() {
-         this.$store.commit("toggleInventory")
+         this.$store.commit("transfer/toggleInventory")
       }
    }
 };

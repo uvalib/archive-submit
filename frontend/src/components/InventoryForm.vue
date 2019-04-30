@@ -3,7 +3,7 @@
       <div class="modal-mask">
          <div class="modal-container">
             <h3>Physical Records Inventory</h3>
-            <div class="content">
+            <div class="inventory-content">
                <table class="pure-table  pure-table-bordered"> 
                   <thead>
                      <tr>
@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
    components: {
    },
@@ -63,33 +64,37 @@ export default {
    },
    computed: {
       inventory() {
-         return this.$store.state.physical.inventory
+         return this.$store.state.transfer.physical.inventory
       },
+      ...mapGetters({
+         inventoryItem: 'transfer/inventoryItem',
+         inventoryCount: 'transfer/inventoryCount',
+      })
    },
    methods: {
       closeClicked() {
-         this.$store.commit("toggleInventory")
+         this.$store.commit("transfer/toggleInventory")
       },
       clearClicked() {
-         this.$store.commit("clearInventory")
+         this.$store.commit("transfer/clearInventory")
       },
       addClicked() {
-         this.$store.commit("addInventory")
-         let len = this.$store.getters.inventoryCount
+         this.$store.commit("transfer/addInventory")
+         let len = this.inventoryCount
          this.editIdx = len-1
-         this.editItem = this.$store.getters.inventoryItem( this.editIdx )
+         this.editItem = this.inventoryItem( this.editIdx )
          setTimeout( function() {
             document.getElementById("first").focus()
          }, 100)
       },
       removeClicked(event) {
          let idx = event.target.dataset.idx
-         this.$store.commit("deleteInventory", idx)
+         this.$store.commit("transfer/deleteInventory", idx)
       },
       editClicked(event) {
          let idx = event.target.dataset.idx
          this.editIdx = idx
-         this.editItem = this.$store.getters.inventoryItem(idx)
+         this.editItem = this.inventoryItem(idx)
          setTimeout( function() {
             document.getElementById("first").focus()
          }, 100)
@@ -99,7 +104,7 @@ export default {
          this.editItem = null
       },
       okClicked() {
-          this.$store.commit("updateInventory", {idx:this.editIdx, item:this.editItem} )
+          this.$store.commit("transfer/updateInventory", {idx:this.editIdx, item:this.editItem} )
           this.editIdx = -1
           this.editItem = null
       },
@@ -141,7 +146,7 @@ span.pure-button  {
 table {
    width:100%;
 }
-.content table td input,  .content table td textarea {
+.inventory-content table td input,  .content table td textarea {
    margin: 0;
    width: 100%;
    border-radius: 0;
@@ -150,10 +155,10 @@ table {
    outline:none;
    background: aliceblue;
 }
-.content table td.edit {
+.inventory-content table td.edit {
    padding:0px;
 }
-.content {
+.inventory-content {
    padding: 10px;
 }
 h3 {
