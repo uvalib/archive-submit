@@ -59,15 +59,15 @@ func (user *User) FullName() string {
 
 // SendReceiptEmail will send the user (and admins) a transfer receipt email
 func (user *User) SendReceiptEmail(db *dbx.DB, smtpCfg SMTPConfig, accession Accession) {
-	log.Printf("Get BCC users for receipt")
-	var bcc []string
+	to := []string{user.Email}
 	q := db.NewQuery(`select email from users where admin=1`)
 	rows, _ := q.Rows()
 	for rows.Next() {
 		var email string
 		rows.Scan(&email)
-		bcc = append(bcc, email)
+		to = append(to, email)
 	}
+	log.Printf("Send Receipt email recipients: %s", strings.Join(to, ","))
 
 	type Data struct {
 		*Accession
@@ -106,9 +106,8 @@ func (user *User) SendReceiptEmail(db *dbx.DB, smtpCfg SMTPConfig, accession Acc
 	log.Printf("Generate SMTP message")
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	subject := "Subject: UVA Archives Transfer Receipt\n"
-	toHdr := fmt.Sprintf("To: %s\n", accession.User.Email)
-	BCC := fmt.Sprintf("Bcc: %s\n", strings.Join(bcc, ","))
-	msg := []byte(subject + toHdr + BCC + mime + renderedEmail.String())
+	toHdr := fmt.Sprintf("To: %s\n", user.Email)
+	msg := []byte(subject + toHdr + mime + renderedEmail.String())
 
 	if smtpCfg.DevMode {
 		log.Printf("Email is in dev mode. Logging message instead of sending")
@@ -116,8 +115,9 @@ func (user *User) SendReceiptEmail(db *dbx.DB, smtpCfg SMTPConfig, accession Acc
 		log.Printf("%s", msg)
 		log.Printf("==================================================")
 	} else {
-		log.Printf("Send verify email to %s", accession.User.Email)
-		to := []string{user.Email}
+		// NOTES: per docs, to make a recipient BCC'd, include them in the to
+		// param in the SendMail call, but omit them in the message above.
+		log.Printf("Sending receipt email to %s", strings.Join(to, ","))
 		err := smtp.SendMail(fmt.Sprintf("%s:%d", smtpCfg.Host, smtpCfg.Port), nil, "no-reply@virginia.edu", to, msg)
 		if err != nil {
 			log.Printf("ERROR: Unable to send receipt email: %s", err.Error())

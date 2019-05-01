@@ -48,10 +48,12 @@ export default {
    created() {
       let authUser = this.$cookies.get("archives_xfer_user")
       if (authUser) {
-         this.$store.commit("setUser", authUser)
-         this.$store.dispatch("admin/getAccessions")
+        this.$store.commit("setUser", authUser)
+        this.$store.dispatch("admin/getAccessions")
+        this.$cookies.remove("archives_xfer_user")
+        this.$cookies.remove("archives_xfer_settings")
       } else {
-         this.$router.push("forbidden")
+        this.$router.push("forbidden")
       }
    }
 }
