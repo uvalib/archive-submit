@@ -15,13 +15,39 @@ import (
 
 // DigitalAccession contains data supporting digital file accessions
 type DigitalAccession struct {
-	ID            int      `json:"-"`
-	AccessionID   int      `json:"-" db:"accession_id"`
-	Description   string   `json:"description" db:"description"`
-	DateRange     string   `json:"dateRange" db:"date_range"`
-	RecordTypeIDs []string `json:"selectedTypes" db:"-"`
-	Files         []string `json:"uploadedFiles" db:"-"`
-	TotalSize     int      `json:"totalSizeBytes" db:"upload_size"`
+	ID          int      `json:"-"`
+	AccessionID int      `json:"-" db:"accession_id"`
+	Description string   `json:"description" db:"description"`
+	DateRange   string   `json:"dateRange" db:"date_range"`
+	RecordTypes []string `json:"selectedTypes" db:"-"`
+	Files       []string `json:"uploadedFiles" db:"-"`
+	TotalSize   int      `json:"totalSizeBytes" db:"upload_size"`
+}
+
+// GetFiles retrieves the list of files associated with this accession
+func (da *DigitalAccession) GetFiles(db *dbx.DB) {
+	q := db.NewQuery("select filename from digital_files where digital_accession_id={:id}")
+	q.Bind((dbx.Params{"id": da.ID}))
+	rows, _ := q.Rows()
+	for rows.Next() {
+		var fn string
+		rows.Scan(&fn)
+		da.Files = append(da.Files, fn)
+	}
+}
+
+// GetRecordTypes retrieves the list of files associated with this accession
+func (da *DigitalAccession) GetRecordTypes(db *dbx.DB) {
+	q := db.NewQuery(`select t.name from record_types t 
+		inner join accession_record_types a  on a.record_type_id = t.id
+		where a.accession_id={:id} and a.accession_type={:type}`)
+	q.Bind((dbx.Params{"id": da.ID, "type": "digital"}))
+	rows, _ := q.Rows()
+	for rows.Next() {
+		var fn string
+		rows.Scan(&fn)
+		da.RecordTypes = append(da.RecordTypes, fn)
+	}
 }
 
 // TableName defines the expected DB table name that holds data for digital accessions
@@ -106,6 +132,47 @@ func (a *Accession) WriteGenres(tx *dbx.Tx) {
 	}
 }
 
+// GetGenres get genre info for an accession to the DB
+func (a *Accession) GetGenres(db *dbx.DB) {
+	q := db.NewQuery(`select g.name from genres g inner join accession_genres ag on ag.genre_id = g.id 
+		where accession_id={:id}`)
+	q.Bind((dbx.Params{"id": a.ID}))
+	rows, err := q.Rows()
+	if err != nil {
+		log.Printf("ERROR: Unable to get generes for %d:%s", a.ID, err.Error())
+		return
+	}
+	for rows.Next() {
+		var name string
+		rows.Scan(&name)
+		a.Genres = append(a.Genres, name)
+	}
+}
+
+// GetDigitalTransferDetail will get details for a digital transfer
+func (a *Accession) GetDigitalTransferDetail(db *dbx.DB) {
+	q := db.NewQuery("select * from digital_accessions where accession_id={:id}")
+	q.Bind((dbx.Params{"id": a.ID}))
+	err := q.One(&a.Digital)
+	if err != nil {
+		return
+	}
+	a.DigitalTransfer = true
+	a.Digital.GetFiles(db)
+	a.Digital.GetRecordTypes(db)
+}
+
+// GetPhysicalTransferDetail will get details for a digital transfer
+func (a *Accession) GetPhysicalTransferDetail(db *dbx.DB) {
+	q := db.NewQuery("select * from physical_accessions where accession_id={:id}")
+	q.Bind((dbx.Params{"id": a.ID}))
+	err := q.One(&a.Physical)
+	if err != nil {
+		return
+	}
+	a.PhysicalTransfer = true
+}
+
 // WriteDigitalTransfer writes digital xfer info for an accession to the DB
 func (a *Accession) WriteDigitalTransfer(tx *dbx.Tx) error {
 	log.Printf("Commmit digital transfer details for accession %d", a.ID)
@@ -128,7 +195,7 @@ func (a *Accession) WriteDigitalTransfer(tx *dbx.Tx) error {
 	}
 
 	log.Printf("Commmit digital record types")
-	for _, IDStr := range a.Digital.RecordTypeIDs {
+	for _, IDStr := range a.Digital.RecordTypes {
 		ID, _ := strconv.Atoi(IDStr)
 		_, err := tx.Insert("accession_record_types", dbx.Params{
 			"accession_id":   a.Digital.ID,

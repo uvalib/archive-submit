@@ -79,5 +79,8 @@ func (svc *ServiceContext) GetAccessionDetail(c *gin.Context) {
 		log.Printf("ERROR: Unable to get accession %s: %s", ID, err.Error())
 		return
 	}
+	accession.GetGenres(svc.DB)
+	accession.GetDigitalTransferDetail(svc.DB)
+
 	c.JSON(http.StatusOK, accession)
 }
