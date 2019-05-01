@@ -5,6 +5,7 @@ import Access from './views/Access.vue'
 import Submit from './views/Submit.vue'
 import Thanks from './views/Thanks.vue'
 import Admin from './views/Admin.vue'
+import Accession from './views/Accession.vue'
 import Forbidden from './views/Forbidden.vue'
 import Verify from './views/Verify.vue'
 import store from './store'
@@ -55,7 +56,14 @@ export default new Router({
     {
       path: '/admin',
       name: 'admin',
-      component: Admin
+      component: Admin,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/admin/accessions/:id',
+      name: 'accession',
+      component: Accession,
+      meta: { requiresAuth: true }
     },
     {
       path: '/forbidden',

@@ -5,19 +5,25 @@
          <h3>Accessions</h3>
          <table class="pure-table">
             <thead>
-               <th style="width:12px"/>
                <th>Identifier</th>
+               <th>Type</th>
+               <th>Submitter</th>
+               <th>Description</th>
+               <th>Genres</th>
+               <th>Physical</th>
+               <th>Digital</th>
                <th>Transferred</th>
-               <th>Actions</th>
             </thead>
-            <tr v-for="acc in accessions" :key="acc.id">
-               <td><input :data-id="acc.id" type="checkbox"/></td>
-               <td>{{ acc.accessionID }}</td>
-               <td>{{ acc.submittedAt.split("T")[0] }}</td>
-               <td>
-                  <i title="view" class="action fas fa-eye"></i>
-                  <i title="edit" class="action fas fa-edit"></i>
-               </td>
+            <tr v-for="acc in accessions" :key="acc.id" 
+              class="accession" :data-id="acc.id" @click="accessionClicked">
+              <td>{{ acc.accessionID }}</td>
+              <td>{{ acc.type }}</td>
+              <td>{{ acc.submitter }}</td>
+              <td>{{ acc.description }}</td>
+              <td>{{ acc.genres }}</td>
+              <td>{{ acc.physical }}</td>
+              <td>{{ acc.digital }}</td>
+              <td>{{ acc.submittedAt.split("T")[0] }}</td>
             </tr>
          </table>
       </div>
@@ -40,21 +46,18 @@ export default {
       }),
       ...mapGetters({
          loginName: 'admin/loginName',
+         isAuthenticated: 'admin/isAuthenticated',
       })
    },
    methods: {
-  
+     accessionClicked(event) {
+       let tgt = event.currentTarget
+       let accID = tgt.dataset.id
+       this.$router.push("admin/accessions/"+accID)
+     }
    },
    created() {
-      let authUser = this.$cookies.get("archives_xfer_user")
-      if (authUser) {
-        this.$store.commit("setUser", authUser)
-        this.$store.dispatch("admin/getAccessions")
-        this.$cookies.remove("archives_xfer_user")
-        this.$cookies.remove("archives_xfer_settings")
-      } else {
-        this.$router.push("forbidden")
-      }
+      this.$store.dispatch("admin/getAccessions")    
    }
 }
 </script>
@@ -75,24 +78,13 @@ div.error {
   color: firebrick;
   padding: 5px 00 15px;
 }
-i.fas.action {
-   cursor: pointer;
-   opacity: 0.5;
-   margin: 0 5px;
-   font-size: 1.1em;
-}
-i.fas:hover {
-   opacity: 1;
-}
 table {
    width: 100%;
    font-size: 0.85em;
    color: #444;
 }
-th.checkbox {
-   width: 40px;
-}
-td.centered {
-   text-align: center;
+tr.accession:hover {
+  background: #f5f5f5;
+  cursor:pointer;
 }
 </style>

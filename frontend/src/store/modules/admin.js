@@ -6,9 +6,16 @@ const admin = {
       accessions: [],
       totalAccessions: 0,
       page: 0,
-      pageSize: 0
+      pageSize: 0,
+      accessionDetail: null
    },
    getters: {
+      isAuthenticated(state) {
+         if (state.user == null) {
+            return false
+         }
+         return state.user.authenticated
+      },
       loginName (_state, _getters, rootState) {
          if (rootState.user == null) {
             return ""
@@ -21,15 +28,22 @@ const admin = {
          state.totalAccessions = accessionsInfo.total 
          state.page = accessionsInfo.page
          state.pageSize = accessionsInfo.pageSize
+         state.accessions.length = 0
          accessionsInfo.accessions.forEach( function(acc) {
             state.accessions.push(acc)
          })
       },
       clearAccessions (state) {
-         state.accessions = []
+         state.accessions.length = 0
          state.totalAccessions = 0
          state.page = 0
       },
+      clearAccessionDetail (state) {
+         state.accessionDetail = null
+      },
+      setAccessionDetail (state, data) {
+         state.accessionDetail = data
+      }
    },
    actions: {
       getAccessions( ctx ) {
@@ -40,6 +54,14 @@ const admin = {
             ctx.commit('setError', "Internal Error: Unable to get accessions", {root:true})
          })
       },
+      getAccessionDetail(ctx, id) {
+         ctx.commit('clearAccessionDetail')
+         axios.get("/api/admin/accessions/"+id).then((response)  =>  {
+            ctx.commit('setAccessionDetail', response.data )
+         }).catch(() => {
+            ctx.commit('setError', "Internal Error: Unable to get accession detail", {root:true})
+         })
+      }
    }
 }
 export default admin

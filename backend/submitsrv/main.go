@@ -47,6 +47,7 @@ func main() {
 		admin := api.Group("/admin")
 		{
 			admin.GET("/accessions", svc.AuthMiddleware, svc.GetAccessions)
+			admin.GET("/accessions/:id", svc.AuthMiddleware, svc.GetAccessionDetail)
 		}
 	}
 

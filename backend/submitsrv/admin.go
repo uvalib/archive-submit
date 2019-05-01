@@ -26,6 +26,12 @@ func (svc *ServiceContext) GetAccessions(c *gin.Context) {
 	type AccessionRow struct {
 		ID          int       `json:"id" db:"id"`
 		AccessionID string    `json:"accessionID" db:"identifier"`
+		Submitter   string    `json:"submitter" db:"submitter"`
+		Description string    `json:"description" db:"description"`
+		Type        string    `json:"type" db:"accession_type"`
+		Genres      string    `json:"genres" db:"genres"`
+		Digital     bool      `json:"digital" db:"digital"`
+		Physical    bool      `json:"physical" db:"physical"`
 		SubmittedAt time.Time `json:"submittedAt" db:"created_at"`
 	}
 	type SubmissionsPage struct {
@@ -40,7 +46,15 @@ func (svc *ServiceContext) GetAccessions(c *gin.Context) {
 	tq := svc.DB.NewQuery("select count(*) as total from accessions")
 	tq.One(&out)
 
-	qs := fmt.Sprintf(`select id, identifier, created_at from accessions 
+	qs := fmt.Sprintf(`select a.id as id, identifier, u.email as submitter, description, 
+		accession_type, group_concat(g.name) genres, 
+		(select count(*) from digital_accessions da where da.accession_id=a.id) as digital,
+		(select count(*) from physical_accessions pa where pa.accession_id=a.id) as physical,
+		a.created_at from accessions a 
+			inner join users u on u.id = user_id
+			inner join accession_genres ag on ag.accession_id = a.id
+			inner join genres g on g.id = ag.genre_id 
+		group by a.id
 		order by created_at desc limit %d,%d`, start, pageSize)
 	q := svc.DB.NewQuery(qs)
 	err := q.All(&out.Accessions)
@@ -51,4 +65,9 @@ func (svc *ServiceContext) GetAccessions(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, out)
+}
+
+// GetAccessionDetail is an admin API call that returns the full detail of an accession
+func (svc *ServiceContext) GetAccessionDetail(c *gin.Context) {
+	c.JSON(http.StatusOK, "stubbed")
 }
