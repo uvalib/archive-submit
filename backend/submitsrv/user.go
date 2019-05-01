@@ -81,7 +81,7 @@ func (user *User) SendReceiptEmail(db *dbx.DB, smtpCfg SMTPConfig, accession Acc
 	}
 
 	data := Data{Accession: &accession}
-	data.Genres = GetVocabNamesCSV(db, "genres", accession.GenreIDs)
+	data.Genres = GetVocabNamesCSV(db, "genres", accession.Genres)
 	if accession.DigitalTransfer {
 		data.DigitalRecordTypes = GetVocabNamesCSV(db, "record_types", accession.Digital.RecordTypeIDs)
 		sizeGB := float32(accession.Digital.TotalSize) / 1000.0 / 1000.0

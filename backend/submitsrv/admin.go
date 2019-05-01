@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	dbx "github.com/go-ozzo/ozzo-dbx"
 )
 
 // GetAccessions is an asmin API call that returns a paged list of accessions
@@ -69,5 +70,14 @@ func (svc *ServiceContext) GetAccessions(c *gin.Context) {
 
 // GetAccessionDetail is an admin API call that returns the full detail of an accession
 func (svc *ServiceContext) GetAccessionDetail(c *gin.Context) {
-	c.JSON(http.StatusOK, "stubbed")
+	ID := c.Param("id")
+	q := svc.DB.NewQuery("select * from accessions where id={:id}")
+	q.Bind((dbx.Params{"id": ID}))
+	var accession Accession
+	err := q.One(&accession)
+	if err != nil {
+		log.Printf("ERROR: Unable to get accession %s: %s", ID, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, accession)
 }

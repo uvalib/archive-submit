@@ -77,7 +77,7 @@ type Accession struct {
 	Summary          string            `json:"summary" binding:"required" db:"description"`
 	Activities       string            `json:"activities" db:"activities"`
 	Creator          string            `json:"creator" db:"creator"`
-	GenreIDs         []string          `json:"selectedGenres" db:"-"`
+	Genres           []string          `json:"genres" db:"-"`
 	Type             string            `json:"accessionType" db:"accession_type"`
 	CreatedAt        time.Time         `json:"createdAt" db:"created_at"`
 	DigitalTransfer  bool              `json:"digitalTransfer" db:"-"`
@@ -94,7 +94,7 @@ func (a *Accession) TableName() string {
 // WriteGenres writes genre info for an accession to the DB
 func (a *Accession) WriteGenres(tx *dbx.Tx) {
 	log.Printf("Commmit genres")
-	for _, genreIDStr := range a.GenreIDs {
+	for _, genreIDStr := range a.Genres {
 		genreID, _ := strconv.Atoi(genreIDStr)
 		_, err := tx.Insert("accession_genres", dbx.Params{
 			"accession_id": a.ID,
@@ -239,11 +239,14 @@ func (svc *ServiceContext) Submit(c *gin.Context) {
 			return
 		}
 
-		log.Printf("Moving pending upload files to transferred")
+		// Submitted dir gets broken up by YYYY/MM before the submissionID. Make the tree:
+		currTime := time.Now()
+		xferDir := fmt.Sprintf("%s/%s/%s", svc.UploadDir, "transferred", currTime.Format("2006/01"))
+		os.MkdirAll(xferDir, 0777)
+
+		// Move pending into transfer tree
 		pendingDir := fmt.Sprintf("%s/%s", svc.UploadDir, "pending")
 		uploadDir := fmt.Sprintf("%s/%s", pendingDir, accession.Identifier)
-		xferDir := fmt.Sprintf("%s/%s", svc.UploadDir, "transferred")
-		os.MkdirAll(xferDir, 0777)
 		tgtDir := fmt.Sprintf("%s/%s", xferDir, accession.Identifier)
 		log.Printf("Moving pending upload files from %s to %s", uploadDir, tgtDir)
 		err = os.Rename(uploadDir, tgtDir)
