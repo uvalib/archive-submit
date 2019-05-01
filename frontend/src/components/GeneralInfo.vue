@@ -18,9 +18,9 @@
          <label for="creator">Genres of Materials</label>
          <span class="note">(check all that apply)</span>
          <div class="choices">
-            <span v-for="genre in genres" :key="genre.id">
+            <span v-for="genre in sourceGenres" :key="genre.id">
                <label class="pure-checkbox inline">
-                  <input type="checkbox" name="genre" :value="genre.id" v-model="selectedGenres">
+                  <input type="checkbox" name="genre" :value="genre.id" v-model="genres">
                   {{ genre.name }}
                </label>
             </span>
@@ -55,11 +55,11 @@ export default {
          'transfer.accession.summary',
          'transfer.accession.activities',
          'transfer.accession.creator',
-         'transfer.accession.selectedGenres',
+         'transfer.accession.genres',
          'transfer.accession.accessionType',
       ]),
       ...mapState({
-         genres: state => state.transfer.genres,
+         sourceGenres: state => state.transfer.sourceGenres,
       })
    }
 };

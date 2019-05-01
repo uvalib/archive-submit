@@ -7,7 +7,7 @@ const transfer = {
 
    state: {
       showInventory: false,
-      genres: [],
+      sourceGenres: [],
       digitalTransfer: true,
       physicalTransfer: false,
       digitalRecordTypes: [],
@@ -19,7 +19,7 @@ const transfer = {
          summary: '',
          activities: '',
          creator: '',
-         selectedGenres: [],
+         genres: [],
          accessionType: 'new'
       },
       digital: {
@@ -89,14 +89,15 @@ const transfer = {
          state.showInventory = !state.showInventory
       },
       clearSubmissionData(state) {
-         state.accession = { identifier: '', summary: '', activities: '', creator: '', selectedGenres: [],accessionType: 'new' }
+         state.accession = { identifier: '', summary: '', activities: '', creator: '', genres: [],accessionType: 'new' }
          state.digital = { description: '', dateRange: '', selectedTypes: [], 
             uploadedFiles: [], totalSizeBytes: 0 }
          state.physical = { dateRange: '', boxInfo: '', selectedTypes: [], transferMethod: 0, hasDigital: '1',
             techInfo: '', mediaCarriers: [], mediaCount: '', hasSoftware: '0', inventory: [] }
       },
-      setGenres (state, genres) {
-         state.genres = genres
+      setSourceGenres (state, genres) {
+         state.sourceGenres.length = 0
+         state.sourceGenres = genres
       },
       setMediaCarrierChoices (state, carriers) {
          state.mediaCarrierChoices = carriers
@@ -141,9 +142,8 @@ const transfer = {
 
    actions: {
       getGenres( ctx ) {
-         ctx.commit('setGenres', []) 
          axios.get("/api/genres").then((response)  =>  {
-            ctx.commit('setGenres', response.data )
+            ctx.commit('setSourceGenres', response.data )
          }).catch(() => {
             ctx.commit('setError', "Internal Error: Unable to get genres", {root: true})
          })
