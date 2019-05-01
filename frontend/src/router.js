@@ -36,7 +36,7 @@ export default new Router({
         // this could be used to look fo a _shibsession* cookie in the app domain to
         // ensure authorization
         let authUser = Vue.cookies.get("archives_xfer_user")
-        if (store.state.user == null && authUser == null ) {
+        if (store.state.user == null && authUser == null) {
           next("/")
         } else {
           next()

@@ -10,7 +10,7 @@
 <script>
 import ArchivesHeader from "@/components/ArchivesHeader";
 import ArchivesFooter from "@/components/ArchivesFooter";
-import { mapGetters } from "vuex";
+import { mapGetters } from "vuex"
 
 export default {
    components: {
