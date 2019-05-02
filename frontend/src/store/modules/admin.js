@@ -43,6 +43,7 @@ const admin = {
       },
       setAccessionDetail (state, data) {
          state.accessionDetail = data
+         console.log("SET DETAIL DIGITAL: "+state.accessionDetail.digitalTransfer)
       }
    },
    actions: {
@@ -55,11 +56,14 @@ const admin = {
          })
       },
       getAccessionDetail(ctx, id) {
+         ctx.commit("setLoading", true, {root: true})
          ctx.commit('clearAccessionDetail')
          axios.get("/api/admin/accessions/"+id).then((response)  =>  {
             ctx.commit('setAccessionDetail', response.data )
+            ctx.commit("setLoading", false, {root: true})
          }).catch(() => {
             ctx.commit('setError', "Internal Error: Unable to get accession detail", {root:true})
+            ctx.commit("setLoading", false, {root: true})
          })
       }
    }

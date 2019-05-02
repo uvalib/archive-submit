@@ -52,9 +52,9 @@ func (svc *ServiceContext) Authenticate(c *gin.Context) {
 		// it will just be passed along on all admin api requests
 		adminSess := fmt.Sprintf("%s|%s", user.APIToken, user.Email)
 		if devMode {
-			c.SetCookie("archives_xfer_api_session", adminSess, 3600, "/", "", false, true)
+			c.SetCookie("archives_xfer_api_session", adminSess, 0, "/", "", false, true)
 		} else {
-			c.SetCookie("archives_xfer_api_session", adminSess, 3600, "/", "", true, true)
+			c.SetCookie("archives_xfer_api_session", adminSess, 0, "/", "", true, true)
 		}
 	}
 
