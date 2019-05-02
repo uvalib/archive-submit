@@ -89,9 +89,9 @@ func (user *User) SendReceiptEmail(db *dbx.DB, smtpCfg SMTPConfig, accession Acc
 		data.DigitalFiles = strings.Join(accession.Digital.Files, ", ")
 	}
 	if accession.PhysicalTransfer {
-		data.PhysicalRecordTypes = GetVocabNamesCSV(db, "record_types", accession.Physical.RecordTypeIDs)
+		data.PhysicalRecordTypes = GetVocabNamesCSV(db, "record_types", accession.Physical.RecordTypes)
 		data.PhysicalTransferMethod = GetVocabName(db, "transfer_methods", data.Physical.TransferMethodID)
-		data.MediaCarriers = GetVocabNamesCSV(db, "media_carriers", accession.Physical.MediaCarrierIDs)
+		data.MediaCarriers = GetVocabNamesCSV(db, "media_carriers", accession.Physical.MediaCarriers)
 	}
 
 	log.Printf("Rendering receipt email body")

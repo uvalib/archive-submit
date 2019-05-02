@@ -81,6 +81,7 @@ func (svc *ServiceContext) GetAccessionDetail(c *gin.Context) {
 	}
 	accession.GetGenres(svc.DB)
 	accession.GetDigitalTransferDetail(svc.DB)
+	accession.GetPhysicalTransferDetail(svc.DB)
 
 	c.JSON(http.StatusOK, accession)
 }
