@@ -26,6 +26,7 @@
                   <div><b>Date Range of Files:</b><p>{{details.digital.dateRange}}</p></div>
                   <div><b>Record Types:</b><p>{{details.digital.selectedTypes.join(", ")}}</p></div>
                   <div><b>Total Transfer Size:</b><p>{{(details.digital.totalSizeBytes/1000.0/1000.0).toFixed(2)}}GB</p></div>
+                  <div><b>Files Transferred:</b><p>{{details.digital.uploadedFiles.join(", ")}}</p></div>
                </div>
             </template>
             <template v-if="details.physicalTransfer">
