@@ -99,7 +99,7 @@ export default {
          // behind NetBadge. If successful, an API token will be generated and
          // stored in an http-only, secure cookie. User will 
          // be redirected to the admin page
-         window.location.href = "/authenticate?page=admin"
+         window.location.href = "/authenticate?url=/admin"
       },
       uvaStatusClick: function(status) {
          this.$store.commit("setUVA", status)
@@ -121,7 +121,7 @@ export default {
             // state held in vuex. Need to persist key bits in a cookie 
             // for retrieval after the auth redirects happen
             this.$cookies.set("archives_xfer_settings", {physical: physical, digital: digital})
-            window.location.href = "/authenticate?page=submit"
+            window.location.href = "/authenticate?url=/submit"
          }
       }
    }

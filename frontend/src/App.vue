@@ -32,7 +32,7 @@ export default {
                this.$cookies.remove("archives_xfer_user");
                this.$cookies.remove("archives_xfer_settings");
             } else {
-               this.$router.push("forbidden");
+               window.location.href = "/authenticate?url="+this.$router.currentRoute.path
             }
          }
       }
