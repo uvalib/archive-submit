@@ -43,7 +43,6 @@ const admin = {
       },
       setAccessionDetail (state, data) {
          state.accessionDetail = data
-         console.log("SET DETAIL DIGITAL: "+state.accessionDetail.digitalTransfer)
       }
    },
    actions: {

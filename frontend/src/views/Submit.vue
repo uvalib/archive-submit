@@ -121,7 +121,6 @@ export default {
           }
         }
       }
-      // console.log(json)
       axios.post("/api/submit", json).then((/*response*/)  =>  {
         this.$store.commit("transfer/clearSubmissionData") 
         this.$router.push("thanks")

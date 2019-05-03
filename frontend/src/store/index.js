@@ -39,7 +39,6 @@ export default new Vuex.Store({
     },
     setLoading (state, isLoading) {
       state.loading = isLoading
-      console.log("LOADING "+state.loading)
     },
     setUVA (state, isUVA) {
       state.isUVA = isUVA

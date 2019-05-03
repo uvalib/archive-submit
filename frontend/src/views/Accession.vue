@@ -85,13 +85,7 @@ export default {
       }),
       ...mapGetters({
          loginName: 'admin/loginName',
-      }),
-      hasDigital() {
-         console.log("HAS DIGITAL? "+this.details)
-         // let admin = this.$store.state.admin
-         // return admin.details.digitalTransfer
-         return this.details.digitalTransfer
-      }
+      })
    },
    created() {
       this.$store.dispatch("admin/getAccessionDetail", this.$route.params.id)
