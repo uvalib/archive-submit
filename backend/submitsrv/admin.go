@@ -57,6 +57,15 @@ func (svc *ServiceContext) GetAccessions(c *gin.Context) {
 			inner join genres g on g.id = ag.genre_id 
 		group by a.id
 		order by created_at desc limit %d,%d`, start, pageSize)
+
+	// FOR search, add something like this above:
+	// left outer join digital_accessions da on da.accession_id = a.id
+	// left outer join physical_accessions pa on pa.accession_id = a.id
+	// where (a.description like "%1989%" or da.description like "%1989%" or tech_description like "%1989%"
+	// 	or pa.date_range like "%1999%" or da.date_range like "%1999%")
+	// NOTE: when this is added, ther will will need to be either 3 queries (total, filtered total and page)
+	// or 2 (filtered total and page)
+
 	q := svc.DB.NewQuery(qs)
 	err := q.All(&out.Accessions)
 	if err != nil {
