@@ -9,11 +9,14 @@
       </h2>
       <div>
         <div class="list-controls">
-          <div class="search pure-button-group" role="group">
+         <div class="search pure-button-group" role="group">
             <input @input="updateSearchQuery" @keyup.enter="searchClicked" type="text" id="search" :value="queryStr">
             <button  @click="searchClicked"  class="search pure-button pure-button-primary">Search</button>
-          </div>
-          <AccessionPager/>
+         </div>
+         <span class="tag-filter" v-if="tgtGenre.length > 0">
+            <b>Genre:</b> {{tgtGenre}} <i @click="removeFilter" class="unfilter fas fa-times-circle"></i>
+         </span>  
+         <AccessionPager/>
         </div>
          <table class="pure-table">
             <thead>
@@ -31,7 +34,9 @@
                <td>{{ acc.type }}</td>
                <td>{{ acc.submitter }}</td>
                <td>{{ acc.description }}</td>
-               <td>{{ acc.genres }}</td>
+               <td>
+                  <span class="tag" v-for="(tag,idx) in tagList(acc)" :key="idx" @click="tagClicked">{{tag}}</span> 
+               </td>
                <td class="center"><span v-html="typeIcon(acc.physical)"></span></td>
                <td class="center"><span v-html="typeIcon(acc.digital)"></span></td>
                <td>{{ acc.submittedAt.split("T")[0] }}</td>
@@ -58,6 +63,7 @@ export default {
          error: state => state.error,
          loading: state => state.loading,
          queryStr: state => state.admin.queryStr,
+         tgtGenre: state => state.admin.tgtGenre,
       }),
       ...mapGetters({
          loginName: "admin/loginName"
@@ -82,6 +88,23 @@ export default {
       searchClicked() {
          this.$store.dispatch("admin/getAccessionsPage")
       },
+      tagList( acc ) {
+         if (acc.genres) {
+            return acc.genres.split(",")
+         } 
+         return []
+      },
+      tagClicked(event) {
+         event.stopPropagation()
+         // textContent may return whitepace before/after tag. Strip it
+         let tag = event.currentTarget.textContent.replace(/^\s+|\s+$/g, '')
+         this.$store.commit('admin/setGenreFilter', tag)
+         this.$store.dispatch("admin/getAccessionsPage")
+      },
+      removeFilter() {
+         this.$store.commit('admin/setGenreFilter', "")
+         this.$store.dispatch("admin/getAccessionsPage")
+      }
    },
    created() {
       this.$store.commit("admin/resetAccessionsSearch");
@@ -98,12 +121,45 @@ div.admin {
    min-width: 1000px;
    padding: 30px 50px 250px 50px;
 }
+.tag-filter {
+   font-size: 0.8em;
+   border: 1px solid #ccc;
+   padding: 2px 4px 0 10px;
+   border-radius: 20px;
+   cursor: pointer;
+}
+span.tag {
+   display: inline-block;
+   margin: 0 4px 4px 0;
+   font-size: 0.9em;
+   background: #0078e7;
+   color: white;
+   padding: 2px 10px 2px 10px;
+   font-weight: 500;
+   opacity: 0.6;
+   border-radius: 20px;
+}
+span.tag:hover {
+   cursor: pointer;
+   opacity: 1;
+}
+i.fas.unfilter {
+   color: firebrick;
+   margin-left: 5px;
+   opacity: 0.6;
+}
+i.fas.unfilter:hover {
+   cursor: pointer;
+   opacity: 1;
+}
 div.list-controls {
   position:relative;
   margin: 25px 0 5px 0;
 }
 div.search {
   font-size: 14px;
+  display: inline-block;
+  margin-right: 10px;
 }
 div.search button.search.pure-button {
   padding: 3px 15px;

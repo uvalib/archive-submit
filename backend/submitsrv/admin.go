@@ -76,22 +76,44 @@ func (svc *ServiceContext) GetAccessions(c *gin.Context) {
 		qs += qQuery
 	}
 
-	if qParam != "" {
+	gParam := strings.TrimSpace(c.Query("g"))
+	if gParam != "" {
+		log.Printf("Filter submission by genre [%s]", gParam)
+		// To ensure all tags are included in result, can't use where clause.
+		// If used, only the single matching tag is returned. Instead add a having
+		// clause to the group by. The is leaves all tags in the results and matches
+		// on the CSV tag list instead.
+		groupQS += " having Find_In_Set({:g}, genres)"
+	}
+
+	if qParam != "" || gParam != "" {
 		countQS := "select count(distinct a.id) as filtered_cnt " + fromQS
 		if qQuery != "" {
 			countQS += qQuery
 		}
 
+		// Since all of the tags are not required for a simple match count,
+		// the weird group by and having find_in_set is not needed.
+		// Just a simple where will work.
+		if gParam != "" {
+			if strings.Contains(countQS, " where ") {
+				countQS += " and "
+			} else {
+				countQS += " where "
+			}
+			countQS += " g.name={:t}"
+		}
+
 		log.Printf("Get filtered total")
 		cq := svc.DB.NewQuery(countQS)
-		cq.Bind(dbx.Params{"q": qParam})
+		cq.Bind(dbx.Params{"q": qParam, "g": gParam})
 		cq.Row(&out.FilteredTotal)
 	}
 
 	log.Printf("Get one page of submission data")
 	qs = qs + groupQS + pageQS
 	q := svc.DB.NewQuery(qs)
-	q.Bind(dbx.Params{"q": qParam})
+	q.Bind(dbx.Params{"q": qParam, "g": gParam})
 	err := q.All(&out.Accessions)
 	if err != nil {
 		log.Printf("ERROR: Unable to get accessions: %s", err.Error())

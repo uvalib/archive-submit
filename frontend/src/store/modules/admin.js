@@ -10,6 +10,7 @@ const admin = {
       pageSize: 0,
       accessionDetail: null,
       queryStr: "",
+      tgtGenre: ""
    },
    getters: {
       loginName(_state, _getters, rootState) {
@@ -20,7 +21,11 @@ const admin = {
       }
    },
    mutations: {
+      setGenreFilter(state, val) {
+         state.tgtGenre = val
+      },
       resetAccessionsSearch(state) {
+         state.tgtGenre = ""
          state.queryStr = ""
          state.page = 1
          state.filteredTotal = 0
@@ -28,7 +33,6 @@ const admin = {
          state.accessions.length = 0
       },
       setAccessionsPage(state, resp) {
-         console.log("FILTERED TOTAL: "+resp.filteredTotal)
          state.totalAccessions = resp.total
          state.filteredTotal = resp.filteredTotal
          state.page = resp.page
@@ -80,6 +84,9 @@ const admin = {
          if (ctx.state.queryStr.length > 0) {
             url = url + "&q=" + ctx.state.queryStr
          }
+         if (ctx.state.tgtGenre.length > 0 ) {
+            url = url +"&g="+ctx.state.tgtGenre
+          }
          axios.get(url, { withCredentials: true }).then((response) => {
             ctx.commit('setAccessionsPage', response.data)
             ctx.commit("setLoading", false, { root: true })

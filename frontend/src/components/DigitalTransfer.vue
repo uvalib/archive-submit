@@ -31,6 +31,8 @@
             <div class="dropzone-custom">
                <div class="upload title">Drag and drop to upload content</div>
                <div class="upload subtitle">or click to select a file from your computer</div>
+               <div class="upload note"><b>Do not add folders directly</b> as the structure will not be preserved.</div>
+               <div class="upload note">Instead, compress the folders first. Accepted formats: <b>.zip, .gzip, .tar, .gz</b></div>
             </div>
          </vue-dropzone>
          <div class="total-size">
@@ -61,7 +63,8 @@ export default {
             maxFilesize: null,
             chunking: true,
             chunkSize: 10000000, // bytes = 10Mb,
-            addRemoveLinks: true 
+            addRemoveLinks: true,
+            duplicateCheck: true
          }
       }
    },
@@ -122,7 +125,16 @@ div.upload.title {
   margin-top: 15px;
 }
 div.upload.subtitle {
-  font-weight: 500;
+  font-weight: 100;
   margin-top: 5px;
+  margin-bottom: 15px;
+  font-size: 0.9em;
+  color: #999;
+}
+div.upload.note {
+   font-weight: 500;
+  margin-top: 5px;
+  font-size: 1em;
+  color: #666;
 }
 </style>
