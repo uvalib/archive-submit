@@ -28,9 +28,12 @@ export default new Vuex.Store({
   },
   getters: {
     getField,
-    hasError: state => {
-      return state.error != null
-    }
+    isAuthenticated(state) {
+      if (state.user == null) {
+         return false
+      }
+      return state.user.authenticated
+   },
   },
   mutations: {
     updateField,

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,10 +37,11 @@ func (svc *ServiceContext) GetAccessions(c *gin.Context) {
 		SubmittedAt time.Time `json:"submittedAt" db:"created_at"`
 	}
 	type SubmissionsPage struct {
-		Total      int            `json:"total"`
-		Page       int            `json:"page"`
-		PageSize   int            `json:"pageSize"`
-		Accessions []AccessionRow `json:"accessions"`
+		Total         int            `json:"total"`
+		FilteredTotal int            `json:"filteredTotal"`
+		Page          int            `json:"page"`
+		PageSize      int            `json:"pageSize"`
+		Accessions    []AccessionRow `json:"accessions"`
 	}
 	out := SubmissionsPage{Total: 0, Page: page, PageSize: pageSize}
 
@@ -47,26 +49,49 @@ func (svc *ServiceContext) GetAccessions(c *gin.Context) {
 	tq := svc.DB.NewQuery("select count(*) as total from accessions")
 	tq.One(&out)
 
-	qs := fmt.Sprintf(`select a.id as id, identifier, u.email as submitter, description, 
-		accession_type, group_concat(g.name) genres, 
+	selQS := fmt.Sprintf(`select a.id as id, identifier, concat(u.first_name, ' ', u.last_name) as submitter, 
+		a.description as description, accession_type, group_concat(g.name) genres, 
 		(select count(*) from digital_accessions da where da.accession_id=a.id) as digital,
 		(select count(*) from physical_accessions pa where pa.accession_id=a.id) as physical,
-		a.created_at from accessions a 
+		a.created_at`)
+	fromQS := ` from accessions a 
 			inner join users u on u.id = user_id
 			inner join accession_genres ag on ag.accession_id = a.id
-			inner join genres g on g.id = ag.genre_id 
-		group by a.id
-		order by created_at desc limit %d,%d`, start, pageSize)
+			inner join genres g on g.id = ag.genre_id
+			left outer join digital_accessions da on da.accession_id = a.id
+			 left outer join physical_accessions pa on pa.accession_id = a.id`
+	qs := selQS + fromQS
+	groupQS := " group by a.id"
+	pageQS := fmt.Sprintf(" order by created_at desc limit %d,%d", start, pageSize)
 
-	// FOR search, add something like this above:
-	// left outer join digital_accessions da on da.accession_id = a.id
-	// left outer join physical_accessions pa on pa.accession_id = a.id
-	// where (a.description like "%1989%" or da.description like "%1989%" or tech_description like "%1989%"
-	// 	or pa.date_range like "%1999%" or da.date_range like "%1999%")
-	// NOTE: when this is added, ther will will need to be either 3 queries (total, filtered total and page)
-	// or 2 (filtered total and page)
+	// Check for and apply and filter / query params
+	qParam := strings.TrimSpace(c.Query("q"))
+	qQuery := ""
+	if qParam != "" {
+		log.Printf("Filter accessions by query string [%s]", qParam)
+		qParam = "%" + qParam + "%"
+		qQuery = ` where (a.description like {:q} or da.description like {:q} or tech_description like {:q}
+			or first_name like {:q} or last_name like {:q}
+			or pa.date_range like {:q} or da.date_range like {:q} or a.created_at like {:q})`
+		qs += qQuery
+	}
 
+	if qParam != "" {
+		countQS := "select count(distinct a.id) as filtered_cnt " + fromQS
+		if qQuery != "" {
+			countQS += qQuery
+		}
+
+		log.Printf("Get filtered total")
+		cq := svc.DB.NewQuery(countQS)
+		cq.Bind(dbx.Params{"q": qParam})
+		cq.Row(&out.FilteredTotal)
+	}
+
+	log.Printf("Get one page of submission data")
+	qs = qs + groupQS + pageQS
 	q := svc.DB.NewQuery(qs)
+	q.Bind(dbx.Params{"q": qParam})
 	err := q.All(&out.Accessions)
 	if err != nil {
 		log.Printf("ERROR: Unable to get accessions: %s", err.Error())

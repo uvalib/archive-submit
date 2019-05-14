@@ -12,7 +12,7 @@ import store from './store'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
@@ -70,5 +70,29 @@ export default new Router({
       name: 'forbidden',
       component: Forbidden
     }
-  ]
+  ],
+  scrollBehavior(/*to, from, savedPosition*/) {
+    return { x: 0, y: 0 }
+  },
 })
+
+router.beforeEach((to, _from, next) => {
+  if (to.meta.requiresAuth == true) {
+    let getters = store.getters
+    let isAuth = getters["isAuthenticated"]
+    if ( isAuth === false) {
+      let authUser = Vue.cookies.get("archives_xfer_user")
+      if (authUser) {
+        authUser.authenticated = true
+        store.commit("setUser", authUser)
+        Vue.cookies.remove("archives_xfer_user");
+        Vue.cookies.remove("archives_xfer_settings");
+      } else {
+        window.location.href = "/authenticate?url=" + to.fullPath
+      }
+    }
+  } 
+  next()
+})
+
+export default router

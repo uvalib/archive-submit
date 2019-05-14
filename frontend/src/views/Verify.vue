@@ -1,6 +1,5 @@
 <template>
    <div class="verify content">
-      <h2>University Archives Records Transfer Form</h2>
       <template v-if="state === 'verify'">
           <h3>Verifying</h3>
          <p>

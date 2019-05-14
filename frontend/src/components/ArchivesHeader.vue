@@ -1,8 +1,8 @@
 <template>
    <div class="header">
       <router-link :to="{ name: 'home'}">
-         <span class="site-name small">Albert and Shelly Small</span>
-         <span class="site-name">Special Collections Library</span>
+         <span class="site-name small">Albert and Shelly Small Special Collections Library</span>
+         <span class="site-name">Records Transfer Form</span>
       </router-link>
       <a target="_blank" href="https://library.virginia.edu"><img class="uva-library" src="../assets/uvalogo.png"/></a>
    </div>

@@ -1,32 +1,32 @@
 <template>
-   <div class="accession content">
+   <div class="accession admin">
       <template v-if="loading">
          <h1>Loading...</h1>
       </template>
       <template v-else>
          <h2>
-            Archives Records Transfer System Admin Panel<span class="login"><b>Logged in as:</b>{{loginName}}</span>
+            System Admin Panel<span class="login"><b>Logged in as:</b>{{loginName}}</span>
          </h2>
          <router-link to="/admin"><i class="fas fa-arrow-left"></i>&nbsp;Back to Accessions</router-link>
          <div class="accession-details">
             <h3>General Information</h3>
             <div class="info-block">
                <div><b>Transfer Identifier:</b><p>{{details.identifier}}</p></div>
-               <div><b>Transfer Date/Time:</b><p>{{details.createdAt.split("T")[0]}}</p></div>
+               <div><b>Transferred On</b><p>{{formattedDate(details)}}</p></div>
                <div><b>Accession Type:</b><p>{{details.accessionType}}</p></div>
                <div><b>Summary:</b><p>{{details.summary}}</p></div>
                <div><b>Activities Leading to Creation:</b><p>{{details.activities}}</p></div>
                <div><b>Creator:</b><p>{{details.creator}}</p></div>
-               <div><b>Genres:</b><p>{{details.genres.join(", ")}}</p></div>
+               <div><b>Genres:</b><p>{{safeCSV(details.genres)}}</p></div>
             </div>
             <template v-if="details.digitalTransfer">
                <h3>Digital Transfer Details</h3>
                <div class="info-block">
                   <div><b>Technical Description:</b><p>{{details.digital.description}}</p></div>
                   <div><b>Date Range of Files:</b><p>{{details.digital.dateRange}}</p></div>
-                  <div><b>Record Types:</b><p>{{details.digital.selectedTypes.join(", ")}}</p></div>
+                  <div><b>Record Types:</b><p>{{safeCSV(details.digital.selectedTypes)}}</p></div>
                   <div><b>Total Transfer Size:</b><p>{{(details.digital.totalSizeBytes/1000.0/1000.0).toFixed(2)}}GB</p></div>
-                  <div><b>Files Transferred:</b><p>{{details.digital.uploadedFiles.join(", ")}}</p></div>
+                  <div><b>Files Transferred:</b><p>{{safeCSV(details.digital.uploadedFiles)}}</p></div>
                </div>
             </template>
             <template v-if="details.physicalTransfer">
@@ -34,7 +34,7 @@
                <div class="info-block">
                   <div><b>Date Range of Records:</b><p>{{details.physical.dateRange}}</p></div>
                   <div><b>Number and Size of Boxes:</b><p>{{details.physical.boxInfo}}</p></div>
-                  <div><b>Record Types:</b><p>{{details.physical.selectedTypes.join(", ")}}</p></div>
+                  <div><b>Record Types:</b><p>{{safeCSV(details.physical.selectedTypes)}}</p></div>
                   <div><b>Transfer Method:</b><p>{{details.physical.transferMethodName}}</p></div>
                   <div><b>Transfer Method:</b><p>{{details.physical.transferMethodName}}</p></div>
                </div>
@@ -42,7 +42,7 @@
                   <h3>Digital Media Carrier Details</h3>
                   <div class="info-block">
                      <div><b>Technical Description:</b><p>{{details.physical.techInfo}}</p></div>
-                     <div><b>Media Carriers:</b><p>{{details.physical.mediaCarriers.join(", ")}}</p></div>
+                     <div><b>Media Carriers:</b><p>{{safeCSV(details.physical.mediaCarriers)}}</p></div>
                      <div><b>Media Carrier Estimates:</b><p>{{details.physical.mediaCount}}</p></div>
                      <div><b>Transfer Includes Software:</b><p>{{details.physical.hasSoftware}}</p></div>
                   </div>
@@ -89,11 +89,32 @@ export default {
    },
    created() {
       this.$store.dispatch("admin/getAccessionDetail", this.$route.params.id)
+   },
+   methods: {
+      formattedDate(accession) {
+         if (accession) {
+            return accession.createdAt.split("T")[0]
+         }
+         return "Unknown"
+      },
+      safeCSV(list) {
+         if (list) {
+            return list.join(", ")
+         }
+         return "N/A"
+      }
    }
 }
 </script>
 
 <style scoped>
+div.admin {
+   background: white;
+   color: #444;
+   position: relative;
+   min-width: 1000px;
+   padding: 30px 50px 250px 50px;
+}
 .accession-details {
    padding:0;
    margin:15px 0;

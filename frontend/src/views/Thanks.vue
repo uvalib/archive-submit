@@ -1,6 +1,5 @@
 <template>
    <div class="thanks content">
-      <h2>University Archives Records Transfer Form</h2>
       <div>
          <h3>Thank you!</h3>
          <p>

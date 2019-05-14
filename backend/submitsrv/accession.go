@@ -13,7 +13,7 @@ type DigitalAccession struct {
 	ID          int      `json:"-"`
 	AccessionID int      `json:"-" db:"accession_id"`
 	Description string   `json:"description" db:"description"`
-	DateRange   string   `json:"dateRange" db:"date_range"`
+	DateRange   *string  `json:"dateRange" db:"date_range"`
 	RecordTypes []string `json:"selectedTypes" db:"-"`
 	Files       []string `json:"uploadedFiles" db:"-"`
 	TotalSize   int      `json:"totalSizeBytes" db:"upload_size"`
@@ -132,8 +132,8 @@ type Accession struct {
 	UserID           int               `json:"-" db:"user_id"`
 	User             User              `json:"user" db:"-"`
 	Summary          string            `json:"summary" binding:"required" db:"description"`
-	Activities       string            `json:"activities" db:"activities"`
-	Creator          string            `json:"creator" db:"creator"`
+	Activities       *string           `json:"activities" db:"activities"`
+	Creator          *string           `json:"creator" db:"creator"`
 	Genres           []string          `json:"genres" db:"-"`
 	Type             string            `json:"accessionType" db:"accession_type"`
 	CreatedAt        time.Time         `json:"createdAt" db:"created_at"`

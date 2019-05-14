@@ -13,3 +13,4 @@ env.*
 /pkg
 *.sh
 /uploads
+backend/db/data.sql

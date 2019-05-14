@@ -1,11 +1,8 @@
 <template>
    <div class="home content">
-      <h2>
-         <span>University Archives Records Transfer Form</span>
-         <span class="admin">
-            <button @click="adminClicked" class="pure-button pure-button-primary">Admin Access</button>
-         </span>
-      </h2>
+      <span class="admin">
+         <button @click="adminClicked" class="pure-button pure-button-primary">Admin Access</button>
+      </span>
       <div class="contact">
          <p>University Archives</p>
          <p>Albert & Shirley Small Special Collections Library</p>
@@ -152,7 +149,14 @@ td.label {
 span.admin {
    font-size: 12px;
    position: absolute;
-   right: 0;
+   right: -1px;
+   top: -1px;
+}
+
+span.admin button.pure-button.pure-button-primary {
+   border: none;
+   border-radius: 0 0 0 15px;
+   padding: 4px 15px 6px 15px;
 }
 
 div.info {

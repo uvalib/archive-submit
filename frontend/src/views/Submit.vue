@@ -1,6 +1,5 @@
 <template>
   <div class="submit content">
-    <h2>University Archives Records Transfer Form</h2>
     <div class="contact-small">
       <p>University Archives</p>
       <p>Albert & Shirley Small Special Collections Library, P.O. Box 400110, Charlottesville, VA, 22904-4110</p>

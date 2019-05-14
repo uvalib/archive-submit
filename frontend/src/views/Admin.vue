@@ -1,7 +1,7 @@
 <template>
-   <div class="admin content">
+   <div class="admin index">
       <h2>
-         Archives Records Transfer System Admin Panel
+         System Admin Panel
          <span class="login">
             <b>Logged in as:</b>
             {{loginName}}
@@ -10,7 +10,8 @@
       <div>
         <div class="list-controls">
           <div class="search pure-button-group" role="group">
-            <input type="text" id="search"><button class="search pure-button pure-button-primary">Search</button>
+            <input @input="updateSearchQuery" @keyup.enter="searchClicked" type="text" id="search" :value="queryStr">
+            <button  @click="searchClicked"  class="search pure-button pure-button-primary">Search</button>
           </div>
           <AccessionPager/>
         </div>
@@ -21,8 +22,8 @@
                <th>Submitter</th>
                <th>Description</th>
                <th>Genres</th>
-               <th>Physical</th>
-               <th>Digital</th>
+               <th style="width:50px">Physical</th>
+               <th style="width:50px">Digital</th>
                <th>Transferred</th>
             </thead>
             <tr v-for="acc in accessions" :key="acc.id" class="accession" :data-id="acc.id" @click="accessionClicked">
@@ -54,7 +55,9 @@ export default {
    computed: {
       ...mapState({
          accessions: state => state.admin.accessions,
-         error: state => state.error
+         error: state => state.error,
+         loading: state => state.loading,
+         queryStr: state => state.admin.queryStr,
       }),
       ...mapGetters({
          loginName: "admin/loginName"
@@ -72,15 +75,29 @@ export default {
          } else {
             return '<i style="color:firebrick;font-size:20px;opacity:0.6;" class="fas fa-times-circle"></i>'
          }
-      }
+      },
+      updateSearchQuery(e) {
+         this.$store.commit('admin/updateSearchQuery', e.target.value)
+      },
+      searchClicked() {
+         this.$store.dispatch("admin/getAccessionsPage")
+      },
    },
    created() {
-      this.$store.dispatch("admin/getAccessions");
+      this.$store.commit("admin/resetAccessionsSearch");
+      this.$store.dispatch("admin/getAccessionsPage");
    }
 };
 </script>
 
 <style scoped>
+div.admin {
+   background: white;
+   color: #444;
+   position: relative;
+   min-width: 1000px;
+   padding: 30px 50px 250px 50px;
+}
 div.list-controls {
   position:relative;
   margin: 25px 0 5px 0;

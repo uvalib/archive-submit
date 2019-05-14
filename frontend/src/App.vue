@@ -10,33 +10,12 @@
 <script>
 import ArchivesHeader from "@/components/ArchivesHeader";
 import ArchivesFooter from "@/components/ArchivesFooter";
-import { mapGetters } from "vuex"
 
 export default {
    components: {
       ArchivesHeader,
       ArchivesFooter
    },
-   computed: {
-      ...mapGetters({
-         isAuthenticated: "admin/isAuthenticated"
-      })
-   },
-   created: function() {
-      if (this.$route.meta.requiresAuth) {
-         if (this.isAuthenticated == false) {
-            let authUser = this.$cookies.get("archives_xfer_user");
-            if (authUser) {
-               authUser.authenticated = true;
-               this.$store.commit("setUser", authUser);
-               this.$cookies.remove("archives_xfer_user");
-               this.$cookies.remove("archives_xfer_settings");
-            } else {
-               window.location.href = "/authenticate?url="+this.$router.currentRoute.path
-            }
-         }
-      }
-   }
 };
 </script>
 

@@ -1,6 +1,5 @@
 <template>
    <div class="access content">
-      <h2>University Archives Records Transfer Form</h2>
       <template v-if="state === 'verify'">
          <p>
             To access the transfer form, please enter your email below.
