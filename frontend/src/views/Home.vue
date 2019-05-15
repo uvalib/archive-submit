@@ -32,7 +32,28 @@
             transfer method.
          </p>
          <p>
-            Digital records may be transferred through this form. Please zip files prior to uploading
+            Digital records may be transferred through this form. 
+            <span @click="togglePopover" id="popover-trigger">
+               Please compress files
+               <div id="popover" class="hidden">
+                  <span>Compression Info</span>
+                  <i @click="togglePopover" id="close-popover" class="fas fa-times-circle"></i>
+                  <div class="popover-content">
+                     Files compressed with zip, gzip or tar are accepted. 
+                     For more details, click the link for your system.
+                  </div>
+                  <a class="popover-link" 
+                     href="https://support.microsoft.com/en-us/help/14200/windows-compress-uncompress-zip-files" 
+                     target="_bank">Windows</a>
+                  <a class="popover-link" 
+                     href="http://osxdaily.com/2012/01/10/how-to-zip-files-in-mac-os-x/" 
+                     target="_bank">Mac</a>
+                  <a class="popover-link" 
+                     href="https://www.howtogeek.com/248780/how-to-compress-and-extract-files-using-the-tar-command-on-linux/" 
+                     target="_bank">Linux Command-Line</a>
+               </div>
+            </span> 
+            prior to uploading
             for transfer. Please do not transfer files via this form that contain highly sensitive data or
             personally identifiable information (PII), such as social security numbers, credit card numbers,
             or information covered by right to privacy laws such as FERPA or HIPPA. For additional information,
@@ -100,6 +121,15 @@ export default {
       })
    },
    methods: {
+      togglePopover: function( event ) {
+         event.stopPropagation()
+         let po = document.getElementById("popover")
+         if (po.classList.contains("hidden")) {
+            po.classList.remove("hidden")
+         } else  {
+            po.classList.add("hidden")
+         }
+      },
       adminClicked: function() {
          // redirect to the authenticate endpoint (not vue) which is
          // behind NetBadge. If successful, an API token will be generated and
@@ -199,13 +229,49 @@ h4.gap {
    display: block;
    margin: 0 0 10px 25px;
 }
-a {
+a, #popover-trigger {
    color: cornflowerblue;
    font-weight: 500;
    text-decoration: none;
 }
-a:hover {
+a:hover, #popover-trigger:hover {
    text-decoration: underline;
+   cursor: pointer;
+}
+#popover-trigger  {
+   position: relative;
+}
+.hidden {
+   display:none;
+}
+#close-popover {
+   float: right;
+   cursor: pointer;
+}
+a.popover-link {
+   color: white;
+   margin-left: 20px;
+   font-weight: bold;
+   display: block;
+}
+#popover {
+   top:25px;
+   left:0;
+   cursor: default;
+   position: absolute;
+   background: cornflowerblue;
+   font-size: 0.8em;
+   color: white;
+   padding: 10px;
+   border-radius: 5px;
+   width: 200px;
+   border: 2px solid darkblue;
+}
+.popover-content {
+   border-top: 1px solid white;
+   padding-top: 5px;
+   margin-top: 2px;
+   margin-bottom: 5px;
 }
 .error-message {
    width: 100%;
