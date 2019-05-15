@@ -86,4 +86,7 @@ h4 .accordion-icon {
    transform: rotate(0deg);
    transition-duration: 0.4s;
 }
+.accordion {
+   position: relative;
+}
 </style>
