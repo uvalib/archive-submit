@@ -42,9 +42,7 @@
          <p><b>Technical Description:</b><br/>{{.Physical.TechInfo}}</p>
          <p><b>Media Carriers:</b><br/>{{.MediaCarriers}}</p>
          <p><b>Media Carrier Estimates:</b><br/>{{.Physical.MediaCount}}</p>
-         <p><b>Does Transfer Include Software:</b>
-            <br/>{{- if .Physical.HasSoftware}}Yes{{- else}}No{{- end}}
-         </p>
+         <p><b>Does Transfer Include Software:</b><br/>{{.Physical.HasSoftware}}</p>
          {{ end}}
       </div>
       <div>

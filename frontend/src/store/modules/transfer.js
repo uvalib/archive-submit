@@ -38,7 +38,7 @@ const transfer = {
          techInfo: '',
          mediaCarriers: [],
          mediaCount: '',
-         hasSoftware: '0',
+         hasSoftware: 'no',
          inventory: []
       }
    },

@@ -84,7 +84,7 @@ func (svc *ServiceContext) GetMediaCarriers(c *gin.Context) {
 
 // GetTypes returns a list of object types as JSON
 func (svc *ServiceContext) GetTypes(c *gin.Context) {
-	q := svc.DB.NewQuery("SELECT id, name, description, digital FROM record_types")
+	q := svc.DB.NewQuery("SELECT id, name, description, digital FROM record_types order by name asc")
 	var objects []ControlledVocab
 	err := q.All(&objects)
 	if err != nil {

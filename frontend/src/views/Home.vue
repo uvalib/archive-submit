@@ -22,13 +22,18 @@
       <div class="info">
          <p>
             Donors or their representatives should complete this form when transferring paper-based
-            and/or digital administrative records to the University Archives. When possible,
-            send this form (and a box/folder title list for records over 1 cubic foot) electronically
-            prior to sending records. We will then advise you on the appropriate transfer method.
+            and/or digital administrative records to the University Archives. 
+            This form is <b>only</b> for the transfer of university records, not personal archives 
+            donations; to donate personal archives, contact the University Archivist. If you have 
+            specific questions about records retention, please contact 
+            <a href="https://recordsmanagement.virginia.edu/" target="_blank">Records Management</a>.
+            When possible, send this form (and a box/folder title list for records over 1 cubic foot) 
+            electronically prior to sending records. We will then advise you on the appropriate 
+            transfer method.
          </p>
          <p>
             Digital records may be transferred through this form. Please zip files prior to uploading
-            for transfer. Please do not transfer files via this form that contain highly sensitive or
+            for transfer. Please do not transfer files via this form that contain highly sensitive data or
             personally identifiable information (PII), such as social security numbers, credit card numbers,
             or information covered by right to privacy laws such as FERPA or HIPPA. For additional information,
             see
@@ -45,13 +50,17 @@
                </a>
             </li>
          </ul>
-         <p>Contact the University Archivist in advance to discuss records containing PII prior to arranging transfer.</p>
+         <p>Contact the University Archivist in advance to discuss records containing PII 
+            or highly sensitive data prior to arranging transfer.</p>
          <p>
             <b>
                It is necessary to consult with the University Archivist in advance of any records transfers to
                ensure that the material is appropriate and in a condition for archival retention.
+               ** Please note that all records need to be assessed for long-term archival value and 
+               transferring records via this form does not automatically guarantee that the content 
+               will be preserved.
             </b>
-            If you have any questions about this form, please contact the University Archivist.
+            If you have any questions about this form or transferring records, please contact the University Archivist.
          </p>
       </div>
       <div class="access-type">

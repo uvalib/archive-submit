@@ -99,7 +99,6 @@ export default {
         Object.assign(json.physical, this.physical)
         json.physical.transferMethod = parseInt(json.physical.transferMethod, 10)
         json.physical.hasDigital = (json.physical.hasDigital === "1")
-        json.physical.hasSoftware = (json.physical.hasSoftware === "1")
         if (this.physical.boxInfo.length === 0) {
             this.$store.commit("setError", "Please provide some details about the quantity and size of the boxes being transferred") 
             return

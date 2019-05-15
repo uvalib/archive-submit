@@ -51,7 +51,9 @@ insert into record_types(name,description,digital)
    values ("Text", "(e.g., reports, contracts, email)", 1), ("Images", "(e.g., TIFFs, PDFs)", 1), 
    ("Video", "(e.g., How-to-videos, event recordings)", 1), ("Audio/Sound Recordings", "(e.g., interviews)", 1),
    ("Software/Multimedia", "(e.g., SVG, Python)", 1), ("Databases/Data", "(e.g., relational databases, research data)", 1),
-   ("Websites", "(e.g., archived, content-based)", 1), ("Text/Documents", "", 0),
+   ("Websites", "(e.g., archived, content-based)", 1), 
+   ("Social Media Content", "(e.g., downloaded data from Twitter, Facebook, or Instagram)",1),
+   ("Text/Documents", "", 0),
    ("Photographs/Still Images", "", 0), ("Audio/Video Media", "", 0);
 
 --
@@ -178,7 +180,7 @@ CREATE TABLE physical_accessions (
    box_info varchar(255),
    transfer_method_id int(11) NOT NULL,
    has_digital boolean not null default false,
-   has_software boolean not null default false,
+   has_software varchar(10) not null default "no",
    tech_description text,
    media_counts varchar(255),
    FOREIGN KEY (transfer_method_id) REFERENCES transfer_methods(id) ON DELETE CASCADE,

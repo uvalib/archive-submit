@@ -79,7 +79,7 @@ type PhysicalAccession struct {
 	TechInfo         string          `json:"techInfo" db:"tech_description"`
 	MediaCarriers    []string        `json:"mediaCarriers" db:"-"`
 	MediaCount       string          `json:"mediaCount" db:"media_counts"`
-	HasSoftware      bool            `json:"hasSoftware" db:"has_software"`
+	HasSoftware      string          `json:"hasSoftware" db:"has_software"`
 	Inventory        []InventoryItem `json:"inventory" db:"-"`
 }
 

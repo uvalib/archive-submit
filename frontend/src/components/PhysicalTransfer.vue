@@ -10,7 +10,7 @@
                <input id="phys-date-range" class="pure-u-23-24" type="text" v-model="dateRange">
             </div>
             <div class="pure-u-1-2">
-               <label for="box-info">Numer and size of Boxes</label>
+               <label for="box-info">Numer and Size of Boxes</label>
                <input id="box-info" class="pure-u-23-24" type="text" v-model="boxInfo">
             </div>
             <div class="pure-u-1-1 gap">
@@ -40,7 +40,10 @@
                </div>
             </div>
             <div class="pure-u-1-1">
-               <label>Does this transfer include items on digital media carriers?</label>
+               <label>
+                  Does this transfer include items on digital media carriers? 
+                  <span class="note">(e.g., USB Drives, 5.25-inch floppy disks, CDs)</span>
+               </label>
                <label class="pure-radio inline">
                   <input v-model="hasDigital" type="radio" name="has-digital" value="1">
                   Yes
@@ -50,16 +53,7 @@
                   No
                </label>
             </div>
-            <div class="digital-content-questions">
-               <div class="pure-u-1-1 gap">
-                  <label class="digital-info">
-                     Describe Technical Information
-                     <span class="note">(e.g., file structure and organization, software that created files, OS, hardware, naming conventions, and original location).</span>
-                  </label>
-                  <textarea v-model="techInfo" class="digital-info pure-u-1-1" id="tech-description"></textarea>
-               </div>
-               
-               <div class="pure-u-1-1">
+            <div class="pure-u-1-1">
                   <label class="digital-info">
                      Media carriers
                      <span class="note">(check all that apply)</span>
@@ -80,16 +74,22 @@
                   </label>
                   <textarea v-model="mediaCount" class="digital-info pure-u-1-1" id="media-count"></textarea>
                </div>
+            <div class="digital-content-questions">
+               <div class="pure-u-1-1 gap">
+                  <label class="digital-info">
+                     Describe Technical Information
+                     <span class="note">(e.g., file structure and organization, software that created files, OS, hardware, naming conventions, and original location).</span>
+                  </label>
+                  <textarea v-model="techInfo" class="digital-info pure-u-1-1" id="tech-description"></textarea>
+               </div>
+               
                <div class="pure-u-2-5">
                   <label class="digital-info">Do the digital records include any software?</label>
-                  <label class="digital-info pure-radio inline">
-                     <input type="radio" class="digital-info" name="has-software" value="1" v-model="hasSoftware">
-                     Yes
-                  </label>
-                  <label class="digital-info pure-radio inline">
-                     <input type="radio" class="digital-info" name="has-software" value="0" checked v-model="hasSoftware">
-                     No
-                  </label>
+                  <select name="has-software" v-model="hasSoftware">
+                     <option value="no">No</option>
+                     <option value="yes">Yes</option>
+                     <option value="unsure">Unsure</option>
+                  </select>
                </div>
                <div class="pure-u-2-5">
                   <label>
