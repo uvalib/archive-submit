@@ -8,7 +8,7 @@
        <transition name="accordion"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div class="accordion-content"  v-show="expanded">
+         <div class="accordion-content"  v-show="isExpanded">
             <slot></slot>
          </div>
       </transition>
@@ -19,16 +19,20 @@
 export default {
    props: {
       title: String,
-      subtitle: String
+      subtitle: String,
+      expanded: {
+         default: false,
+         type: Boolean
+      }
    },
    data: function() {
       return {
-         expanded: false
+         isExpanded: this.expanded
       };
    },
    computed: {
       rotation() {
-         if (this.expanded) {
+         if (this.isExpanded) {
             return "rotate(180deg)"
          }
          return "rotate(0deg)"
@@ -36,7 +40,7 @@ export default {
    },
    methods: {
       accordionClicked() {
-         this.expanded = !this.expanded
+         this.isExpanded = !this.isExpanded
       },
       beforeEnter: function(el) {
          el.style.height = '0'

@@ -224,3 +224,28 @@ CREATE TABLE inventory_items (
    dates varchar(255),
    FOREIGN KEY (physical_accession_id) REFERENCES physical_accessions(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Create table for notes
+--
+DROP TABLE IF EXISTS notes;
+CREATE TABLE notes (
+   id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   title varchar(255),
+   note text,
+   user_id int(11) NOT NULL,
+   created_at datetime NOT NULL default CURRENT_TIMESTAMP,
+   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Create table for accession notes
+--
+DROP TABLE IF EXISTS accession_notes;
+CREATE TABLE accession_notes (
+   id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   accession_id int(11) NOT NULL,
+   note_id int(11) NOT NULL,
+   FOREIGN KEY (accession_id) REFERENCES accessions(id) ON DELETE CASCADE,
+   FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

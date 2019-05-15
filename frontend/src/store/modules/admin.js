@@ -9,6 +9,7 @@ const admin = {
       page: 0,
       pageSize: 0,
       accessionDetail: null,
+      notes: [],
       queryStr: "",
       tgtGenre: ""
    },
@@ -18,6 +19,9 @@ const admin = {
             return ""
          }
          return rootState.user.firstName + " (" + rootState.user.email + ")"
+      },
+      hasNotes(state) {
+         return state.notes.length > 0
       }
    },
    mutations: {
@@ -44,6 +48,9 @@ const admin = {
       },
       setAccessionDetail(state, data) {
          state.accessionDetail = data
+      },
+      setNotes(state, data) {
+         state.notes = data
       },
       updateSearchQuery(state, val) {
          state.queryStr = val
@@ -101,9 +108,17 @@ const admin = {
          axios.get("/api/admin/accessions/" + id).then((response) => {
             ctx.commit('setAccessionDetail', response.data)
             ctx.commit("setLoading", false, { root: true })
+            ctx.dispatch('getAccessionNotes', id)
          }).catch(() => {
             ctx.commit('setError', "Internal Error: Unable to get accession detail", { root: true })
             ctx.commit("setLoading", false, { root: true })
+         })
+      },
+      getAccessionNotes(ctx, id) {
+         axios.get("/api/admin/accessions/" + id+"/notes").then((response) => {
+            ctx.commit('setNotes', response.data)
+         }).catch(() => {
+            ctx.commit('setError', "Internal Error: Unable to get accession notes", { root: true })
          })
       }
    }

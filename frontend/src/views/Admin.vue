@@ -27,6 +27,7 @@
                <th>Genres</th>
                <th style="width:50px">Physical</th>
                <th style="width:50px">Digital</th>
+               <th style="width:50px">Notes</th>
                <th>Transferred</th>
             </thead>
             <tr v-for="acc in accessions" :key="acc.id" class="accession" :data-id="acc.id" @click="accessionClicked">
@@ -39,6 +40,7 @@
                </td>
                <td class="center"><span v-html="typeIcon(acc.physical)"></span></td>
                <td class="center"><span v-html="typeIcon(acc.digital)"></span></td>
+               <td class="center">{{ acc.notesCount }}</td>
                <td>{{ acc.submittedAt.split("T")[0] }}</td>
             </tr>
          </table>

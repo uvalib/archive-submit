@@ -34,6 +34,7 @@ func (svc *ServiceContext) GetAccessions(c *gin.Context) {
 		Genres      string    `json:"genres" db:"genres"`
 		Digital     bool      `json:"digital" db:"digital"`
 		Physical    bool      `json:"physical" db:"physical"`
+		Notes       int       `json:"notesCount" db:"notes"`
 		SubmittedAt time.Time `json:"submittedAt" db:"created_at"`
 	}
 	type SubmissionsPage struct {
@@ -53,6 +54,7 @@ func (svc *ServiceContext) GetAccessions(c *gin.Context) {
 		a.description as description, accession_type, group_concat(g.name) genres, 
 		(select count(*) from digital_accessions da where da.accession_id=a.id) as digital,
 		(select count(*) from physical_accessions pa where pa.accession_id=a.id) as physical,
+		(select count(*) from accession_notes an where an.accession_id=a.id) as notes,
 		a.created_at`)
 	fromQS := ` from accessions a 
 			inner join users u on u.id = user_id
