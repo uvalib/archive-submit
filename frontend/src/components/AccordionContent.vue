@@ -20,17 +20,37 @@ export default {
    props: {
       title: String,
       subtitle: String,
+      watched: {
+         type: Array,
+         default: null
+      },
       expanded: {
          default: false,
          type: Boolean
       }
    },
+   watch: {
+      watchCount () {
+         if (this.isExpanded) {
+            console.log("watch changed, resize...")
+            setTimeout( () => {
+               console.log("... resizing now. "+this.expandedItem.style.height + " to "+this.expandedItem.style.scrollHeight )
+               this.expandedItem.style.height = this.expandedItem.scrollHeight + 'px'
+            }, 500)
+         }
+      }
+   },
    data: function() {
       return {
-         isExpanded: this.expanded
+         isExpanded: this.expanded,
+         expandedItem: null
       };
    },
    computed: {
+      watchCount() {
+         if (this.watched == null) return 0
+         return this.watched.length
+      },
       rotation() {
          if (this.isExpanded) {
             return "rotate(180deg)"
@@ -47,9 +67,11 @@ export default {
       },
       enter: function(el) {
          el.style.height = el.scrollHeight + 'px'
+         this.expandedItem = el
       },
       beforeLeave: function(el) {
          el.style.height = el.scrollHeight + 'px'
+         this.expandedItem = el
       },
       leave: function(el) {
          el.style.height = '0'

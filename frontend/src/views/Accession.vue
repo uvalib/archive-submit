@@ -74,7 +74,7 @@
                   </div>
                </AccordionContent>
             </template>
-            <AccessionNotes v-if="hasNotes"/>
+            <AccessionNotes/>
          </div>
       </template>
    </div>

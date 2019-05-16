@@ -33,7 +33,7 @@
          </p>
          <p>
             Digital records may be transferred through this form. 
-            <span @click="togglePopover" id="popover-trigger">
+            <span  id="popover-trigger-disabled">
                Please compress files
                <div id="popover" class="hidden">
                   <span>Compression Info</span>

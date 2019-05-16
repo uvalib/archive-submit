@@ -11,7 +11,9 @@ const admin = {
       accessionDetail: null,
       notes: [],
       queryStr: "",
-      tgtGenre: ""
+      tgtGenre: "",
+      addingNote: false,
+      working: false
    },
    getters: {
       loginName(_state, _getters, rootState) {
@@ -25,6 +27,12 @@ const admin = {
       }
    },
    mutations: {
+      setWorking(state, val) {
+         state.working = val
+      },
+      setAddingNote(state, adding) {
+         state.addingNote = adding
+      },
       setGenreFilter(state, val) {
          state.tgtGenre = val
       },
@@ -51,6 +59,9 @@ const admin = {
       },
       setNotes(state, data) {
          state.notes = data
+      },
+      addNote(state, note) {
+         state.notes.push(note)
       },
       updateSearchQuery(state, val) {
          state.queryStr = val
@@ -105,7 +116,7 @@ const admin = {
       getAccessionDetail(ctx, id) {
          ctx.commit("setLoading", true, { root: true })
          ctx.commit('clearAccessionDetail')
-         axios.get("/api/admin/accessions/" + id).then((response) => {
+         axios.get("/api/admin/accessions/" + id, { withCredentials: true }).then((response) => {
             ctx.commit('setAccessionDetail', response.data)
             ctx.commit("setLoading", false, { root: true })
             ctx.dispatch('getAccessionNotes', id)
@@ -115,10 +126,23 @@ const admin = {
          })
       },
       getAccessionNotes(ctx, id) {
-         axios.get("/api/admin/accessions/" + id+"/notes").then((response) => {
+         axios.get("/api/admin/accessions/" + id+"/notes", { withCredentials: true }).then((response) => {
             ctx.commit('setNotes', response.data)
          }).catch(() => {
             ctx.commit('setError', "Internal Error: Unable to get accession notes", { root: true })
+         })
+      },
+      addNote(ctx, data) {
+         let id = ctx.state.accessionDetail.id
+         data.userID = ctx.rootState.user.id
+         ctx.commit("setWorking", true)
+         axios.post("/api/admin/accessions/" + id+"/notes", data, { withCredentials: true }).then((response) => {
+            ctx.commit('addNote', response.data)
+            ctx.commit("setWorking", false)
+            ctx.commit('setAddingNote', false)
+         }).catch((err) => {
+            ctx.commit('setError', err.response.data, { root: true })
+            ctx.commit("setWorking", false)
          })
       }
    }
