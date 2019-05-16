@@ -1,10 +1,17 @@
 <template>
    <div class="header">
-      <router-link :to="{ name: 'home'}">
-         <span class="site-name small">Albert and Shelly Small Special Collections Library</span>
-         <span class="site-name">Records Transfer Form</span>
-      </router-link>
-      <a target="_blank" href="https://library.virginia.edu"><img class="uva-library" src="../assets/uvalogo.png"/></a>
+      <div class="site-link">
+         <router-link to="/">
+            <span class="site-name small">Albert and Shelly Small Special Collections Library</span>
+            <span class="site-name">Records Transfer Form</span>
+         </router-link>
+      </div>
+      <div class="library-link">
+         <a target="_blank" href="https://library.virginia.edu">
+            <img class="uva-library" src="../assets/uvalogo.png"/>
+         </a>
+      </div>
+      <div style="clear:both"></div>
    </div>
 </template>
 
@@ -17,10 +24,12 @@ export default {
 div.header {
    background-color: #20406e;
    color: white;
-   padding:15px;
+   padding:10px;
    border-bottom: 1px solid #5e7799;
    border-top: 1px solid #5e7799;
    text-align: left;
+   position: relative;
+   box-sizing: border-box;
 }
 a {
   color: white;
@@ -29,8 +38,11 @@ a {
 div.header span.site-name {
    margin: 0;
    font-family: "chaparral-pro", Georgia, "Times New Roman", Times, serif;
-   font-size: 34px;
+   font-size: 28px;
    position: relative;
+}
+div.site-link {
+   float:left;
 }
 div.header span.site-name.small {
   color: #bfc9d5;
@@ -40,10 +52,10 @@ div.header span.site-name.small {
   display: block;
 }
 img.uva-library {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  max-height: 70px;
+  max-height: 50px;
+}
+div.library-link {
+   float:right;
 }
 .subtitle {
    display: inline-block;

@@ -48,7 +48,8 @@ func main() {
 		{
 			admin.GET("/accessions", svc.AuthMiddleware, svc.GetAccessions)
 			admin.GET("/accessions/:id", svc.AuthMiddleware, svc.GetAccessionDetail)
-			admin.GET("/accessions/:id/notes", svc.GetAccessionNotes)
+			admin.GET("/accessions/:id/notes", svc.AuthMiddleware, svc.GetAccessionNotes)
+			admin.POST("/accessions/:id/notes", svc.AuthMiddleware, svc.AddAccessionNote)
 		}
 	}
 
