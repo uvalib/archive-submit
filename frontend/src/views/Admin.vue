@@ -20,15 +20,22 @@
         </div>
          <table class="pure-table">
             <thead>
-               <th>Identifier</th>
-               <th>Type</th>
-               <th>Submitter</th>
-               <th>Description</th>
-               <th>Genres</th>
-               <th style="width:50px">Physical</th>
-               <th style="width:50px">Digital</th>
-               <th style="width:50px">Notes</th>
-               <th>Transferred</th>
+               <th class="nosort">Identifier</th>
+               <th @click="setSort('accession_type')">
+                  Type <span v-html="sortIcon('accession_type')"></span></th>
+               <th style="width:100px" @click="setSort('submitter')">
+                  Submitter <span v-html="sortIcon('submitter')"></span></th>
+               <th class="nosort">Description</th>
+               <th class="nosort">Genres</th>
+               <th style="width:60px" @click="setSort('physical')">
+                  Physical <span v-html="sortIcon('physical')"></span></th>
+               <th style="width:53px" @click="setSort('digital')">
+                  Digital <span v-html="sortIcon('digital')"></span></th>
+               <th style="width:55px" @click="setSort('notes')">
+                  Notes <span v-html="sortIcon('notes')"></span></th>
+               <th style="width:90px" @click="setSort('submittedAt')">
+                  Transferred <span v-html="sortIcon('submittedAt')"></span>
+               </th>
             </thead>
             <tr v-for="acc in accessions" :key="acc.id" class="accession" :data-id="acc.id" @click="accessionClicked">
                <td>{{ acc.accessionID }}</td>
@@ -36,11 +43,13 @@
                <td>{{ acc.submitter }}</td>
                <td>{{ acc.description }}</td>
                <td>
-                  <span class="tag" v-for="(tag,idx) in tagList(acc)" :key="idx" @click="tagClicked">{{tag}}</span> 
+                  <span class="tag" v-for="(tag,idx) in tagList(acc)" :key="idx" @click="tagClicked">
+                     <span v-if="idx!=0">, </span>{{tag}}
+                  </span> 
                </td>
                <td class="center"><span v-html="typeIcon(acc.physical)"></span></td>
                <td class="center"><span v-html="typeIcon(acc.digital)"></span></td>
-               <td class="center">{{ acc.notesCount }}</td>
+               <td class="center">{{ acc.notes }}</td>
                <td>{{ acc.submittedAt.split("T")[0] }}</td>
             </tr>
          </table>
@@ -66,12 +75,26 @@ export default {
          loading: state => state.loading,
          queryStr: state => state.admin.queryStr,
          tgtGenre: state => state.admin.tgtGenre,
+         sortBy: state => state.admin.sortBy,
+         sortDir: state => state.admin.sortDir,
       }),
       ...mapGetters({
          loginName: "admin/loginName"
       })
    },
    methods: {
+      setSort(column) {
+         this.$store.commit('admin/updateSortOrder', column)  
+         this.$store.dispatch("admin/getAccessionsPage")
+      },
+      sortIcon(column) {
+         if (this.sortBy != column) return "" 
+         if (this.sortDir == "desc") {
+            return "<i class='fas fa-sort-down'></i>"
+         } else {
+            return "<i class='fas fa-sort-up'></i>"
+         }
+      },
       accessionClicked(event) {
          let tgt = event.currentTarget;
          let accID = tgt.dataset.id;
@@ -132,18 +155,18 @@ div.admin {
 }
 span.tag {
    display: inline-block;
-   margin: 0 4px 4px 0;
+   /* margin: 0 4px 4px 0; */
    font-size: 0.9em;
-   background: #0078e7;
-   color: white;
-   padding: 2px 10px 2px 10px;
-   font-weight: 500;
-   opacity: 0.6;
-   border-radius: 20px;
+   /* background: #0078e7; */
+   color: cornflowerblue;
+   /* padding: 2px 10px 2px 10px; */
+   font-weight: bold;
+   /* opacity: 0.6;
+   border-radius: 20px; */
 }
 span.tag:hover {
    cursor: pointer;
-   opacity: 1;
+   text-decoration: underline;
 }
 i.fas.unfilter {
    color: firebrick;
@@ -189,6 +212,17 @@ table {
    width: 100%;
    font-size: 0.85em;
    color: #444;
+}
+table th {
+   cursor:pointer;
+   font-weight: 100;
+   white-space: nowrap;
+}
+table th.nosort {
+   cursor: default;
+}
+table th >>> i.fas {
+   color: #666;
 }
 table td {
   border-bottom: 1px solid #ccc;

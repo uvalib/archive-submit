@@ -34,7 +34,7 @@ func (svc *ServiceContext) GetAccessions(c *gin.Context) {
 		Genres      string    `json:"genres" db:"genres"`
 		Digital     bool      `json:"digital" db:"digital"`
 		Physical    bool      `json:"physical" db:"physical"`
-		Notes       int       `json:"notesCount" db:"notes"`
+		Notes       int       `json:"notes" db:"notes"`
 		SubmittedAt time.Time `json:"submittedAt" db:"created_at"`
 	}
 	type SubmissionsPage struct {
@@ -50,7 +50,17 @@ func (svc *ServiceContext) GetAccessions(c *gin.Context) {
 	tq := svc.DB.NewQuery("select count(*) as total from accessions")
 	tq.One(&out)
 
-	selQS := fmt.Sprintf(`select a.id as id, identifier, concat(u.first_name, ' ', u.last_name) as submitter, 
+	sort := strings.TrimSpace(c.Query("sort"))
+	sortBy := strings.Split(sort, ":")[0]
+	sortDir := strings.Split(sort, ":")[1]
+	if sortBy == "" || sortBy == "submittedAt" {
+		sortBy = "created_at"
+	}
+	if sortDir == "" {
+		sortBy = "desc"
+	}
+
+	selQS := fmt.Sprintf(`select a.id as id, identifier, concat(u.last_name, ', ', u.first_name) as submitter, 
 		a.description as description, accession_type, group_concat(g.name) genres, 
 		(select count(*) from digital_accessions da where da.accession_id=a.id) as digital,
 		(select count(*) from physical_accessions pa where pa.accession_id=a.id) as physical,
@@ -64,7 +74,7 @@ func (svc *ServiceContext) GetAccessions(c *gin.Context) {
 			 left outer join physical_accessions pa on pa.accession_id = a.id`
 	qs := selQS + fromQS
 	groupQS := " group by a.id"
-	pageQS := fmt.Sprintf(" order by created_at desc limit %d,%d", start, pageSize)
+	pageQS := fmt.Sprintf(" order by %s %s limit %d,%d", sortBy, sortDir, start, pageSize)
 
 	// Check for and apply and filter / query params
 	qParam := strings.TrimSpace(c.Query("q"))

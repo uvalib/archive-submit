@@ -3,6 +3,8 @@ import axios from 'axios'
 const admin = {
    namespaced: true,
    state: {
+      sortBy: "submittedAt",
+      sortDir: "desc",
       accessions: [],
       totalAccessions: 0,
       filteredTotal: 0,
@@ -27,6 +29,18 @@ const admin = {
       }
    },
    mutations: {
+      updateSortOrder(state, column) {
+         if (state.sortBy != column) {
+            state.sortBy = column
+            state.sortDir = "desc"
+         } else {
+            if (state.sortDir == "desc") {
+               state.sortDir = "asc"
+            } else {
+               state.sortDir = "desc"
+            }
+         }
+      },
       setWorking(state, val) {
          state.working = val
       },
@@ -104,7 +118,8 @@ const admin = {
          }
          if (ctx.state.tgtGenre.length > 0 ) {
             url = url +"&g="+ctx.state.tgtGenre
-          }
+         }
+         url = url + "&sort="+ctx.state.sortBy+":"+ctx.state.sortDir
          axios.get(url, { withCredentials: true }).then((response) => {
             ctx.commit('setAccessionsPage', response.data)
             ctx.commit("setLoading", false, { root: true })
