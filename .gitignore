@@ -11,6 +11,7 @@ dist/
 .idea
 env.*
 /pkg
-*.sh
 /uploads
 backend/db/data.sql
+package/scripts/build.ksh
+package/scripts/shell.ksh
