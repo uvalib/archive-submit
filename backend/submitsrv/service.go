@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
@@ -40,7 +42,19 @@ func (svc *ServiceContext) Init(cfg *ServiceConfig) {
 
 // GetVersion reports the version of the serivce
 func (svc *ServiceContext) GetVersion(c *gin.Context) {
-	c.String(http.StatusOK, "Archives Transfer Service version %s", version)
+
+	build := "unknown"
+
+	// cos our CWD is the bin directory
+	files, _ := filepath.Glob("../buildtag.*")
+	if len(files) == 1 {
+		build = strings.Replace(files[0], "../buildtag.", "", 1)
+	}
+
+	vMap := make(map[string]string)
+	vMap["version"] = version
+	vMap["build"] = build
+	c.JSON(http.StatusOK, vMap)
 }
 
 // HealthCheck reports the health of the serivce
