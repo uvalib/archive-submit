@@ -60,8 +60,11 @@ func (svc *ServiceContext) GetVersion(c *gin.Context) {
 // HealthCheck reports the health of the serivce
 func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 	q := svc.DB.NewQuery("select version from versions order by created_at desc limit 1")
-	var version string
-	err := q.One(&version)
+	// must provide a struct
+	type Version struct {
+		Version string
+	}
+	err := q.One(&Version{})
 	if err != nil {
 		// gin.H is a shortcut for map[string]interface{}
 		c.JSON(http.StatusInternalServerError, gin.H{"alive": "true", "mysql": "false"})
