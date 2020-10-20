@@ -32,9 +32,7 @@ export default {
    watch: {
       watchCount () {
          if (this.isExpanded) {
-            console.log("watch changed, resize...")
             setTimeout( () => {
-               console.log("... resizing now. "+this.expandedItem.style.height + " to "+this.expandedItem.style.scrollHeight )
                this.expandedItem.style.height = this.expandedItem.scrollHeight + 'px'
             }, 500)
          }
