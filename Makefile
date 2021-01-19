@@ -1,7 +1,11 @@
-GOCMD=go
-GOBUILD=$(GOCMD) build
-GOCLEAN=$(GOCMD) clean
-GOTEST=$(GOCMD) test
+GOCMD = go
+GOBUILD = $(GOCMD) build
+GOCLEAN = $(GOCMD) clean
+GOTEST = $(GOCMD) test
+GOGET = $(GOCMD) get
+GOMOD = $(GOCMD) mod
+GOFMT = $(GOCMD) fmt
+GOVET = $(GOCMD) vet
 
 build: darwin deploy-templates web
 
@@ -32,3 +36,15 @@ linux:
 clean:
 	$(GOCLEAN)
 	rm -rf bin
+
+dep:
+	cd backend/submitsrv; $(GOGET) -u
+	$(GOMOD) tidy
+	$(GOMOD) verify
+
+fmt:
+	cd backend/submitsrv; $(GOFMT)
+
+vet:
+	cd backend/submitsrv; $(GOVET)
+
