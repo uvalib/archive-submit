@@ -1,7 +1,7 @@
 #
 # build the target application
 #
-FROM golang:1.16.0-alpine3.13 as builder
+FROM golang:1.16.5-alpine3.13 as builder
 RUN apk update && apk upgrade && apk add make yarn
 
 WORKDIR /build
@@ -57,3 +57,6 @@ USER webservice
 # Update the virus definitions (always do this last)
 RUN freshclam
 
+#
+# end of file
+#
