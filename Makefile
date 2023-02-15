@@ -38,6 +38,7 @@ clean:
 	rm -rf bin
 
 dep:
+	cd frontend && yarn upgrade
 	cd backend/submitsrv; $(GOGET) -u
 	$(GOMOD) tidy
 	$(GOMOD) verify

@@ -1,20 +1,22 @@
 #
 # build the target application
 #
-FROM golang:1.16.5-alpine3.13 as builder
-RUN apk update && apk upgrade && apk add make yarn
+FROM public.ecr.aws/docker/library/golang:1.20-alpine3.17 as builder
+RUN apk update && apk upgrade && apk add make yarn bash
 
 WORKDIR /build
 COPY go.mod go.sum Makefile ./
 COPY backend ./backend
 COPY frontend ./frontend
 COPY templates ./templates
+# see https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported
+ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN make linux-full
 
 #
 # build the target container
 #
-FROM alpine:3.13
+FROM public.ecr.aws/docker/library/alpine:3.17
 
 # update the packages
 RUN apk update && apk upgrade && apk add bash tzdata ca-certificates clamav && rm -fr /var/cache/apk/*
